@@ -32,7 +32,7 @@ MODEL_ERROR Model::InitModel(char* filename, ID3D11Device* dev, ID3D11DeviceCont
 		return MODEL_FILE_ERROR;
 	fscanf_s(modelFile, "%*s %d", &m_numVertex);
 	VERTEX* modelVertex;
-	modelVertex = (VERTEX*)malloc(m_numVertex * sizeof(VERTEX));
+	modelVertex = new VERTEX[m_numVertex];
 	for (int i = 0; i < m_numVertex; ++i)
 	{
 		fscanf_s(modelFile, "   %*d. pos:[%f, %f, %f]; norm:[%f, %f, %f]; binorm:[%f, %f, %f]; tgt:[%f, %f, %f]; uv:[%f, %f];", &modelVertex[i].pos.x, &modelVertex[i].pos.y, &modelVertex[i].pos.z,
@@ -61,7 +61,7 @@ MODEL_ERROR Model::InitModel(char* filename, ID3D11Device* dev, ID3D11DeviceCont
 
 	fscanf_s(modelFile, "%*s %d", &m_numIndices);
 	unsigned int* modelIndices;
-	modelIndices = (unsigned int*)malloc(m_numIndices * sizeof(unsigned int));
+	modelIndices = new unsigned int[m_numIndices];
 	for(int i =0;i < m_numIndices;i+=3)
 		fscanf_s(modelFile, "%*u.    %u,    %u,    %u   ", &modelIndices[i], &modelIndices[i + 1], &modelIndices[i + 2]);
 	if (ferror(modelFile))
@@ -83,8 +83,8 @@ MODEL_ERROR Model::InitModel(char* filename, ID3D11Device* dev, ID3D11DeviceCont
 
 
 	fclose(modelFile);
-	free(modelIndices);
-	free(modelVertex);
+	delete[] modelIndices;
+	delete[] modelVertex;
 	return MODEL_SUCCESS;
 }
 

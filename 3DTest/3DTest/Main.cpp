@@ -3,6 +3,8 @@
 #include <d3d11.h>
 #include <d3dx11.h>
 #include <d3dx10.h>
+#include <cstdio>
+#include "MemoryOperators.h"
 #include "Vertex.h"
 #include "MathUtil.h"
 #include "Globals.h"
@@ -12,7 +14,7 @@
 #include "Shaders.h"
 #include "ResourceManager.h"
 #include "SceneManager.h"
-#include <cstdio>
+
 using namespace std;
 
 
@@ -123,8 +125,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 
-	//CleanUp();
+	CleanUp();
+	SceneManager::GetInstance()->Clean();
+	SceneManager::DestroyInstance();
+	ResourceManager::GetInstance()->Clean();
+	ResourceManager::DestroyInstance();
 			   //return wParam from WM_QUIT message to Windows
+	MemoryDump();
 	return msg.wParam;
 }
 
@@ -574,7 +581,7 @@ HRESULT InitGraphics()
 	if (!texture.Init("../Resources/Textures/Woman1.tga",dev,devcon))
 		hr = S_FALSE;
  	int res = myShaders.Init("../Resources/Shaders/TriangleShaderVS.hlsl", "../Resources/Shaders/TriangleShaderPS.glsl", dev, devcon);*/
-	int res = myShaders.Init("../Resources/Shaders/TerrainShaderVS.hlsl", "../Resources/Shaders/TerrainShaderPS.glsl", dev, devcon);
+	//int res = myShaders.Init("../Resources/Shaders/TerrainShaderVS.hlsl", "../Resources/Shaders/TerrainShaderPS.glsl", dev, devcon);
 	bool resourceManagerResult;
 	resourceManagerResult = ResourceManager::GetInstance()->Init("../Resources/RM.txt",dev,devcon);
 	if (!resourceManagerResult)

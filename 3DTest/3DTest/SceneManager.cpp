@@ -66,7 +66,9 @@ bool SceneManager::Init(char* FileName)
 		fscanf_s(SMFile, "%s", remark, _countof(remark));
 		if (strcmp(remark, "#CAMERA") == 0)
 		{
-			m_camera = new Camera;
+			if(m_camera == NULL)
+				m_camera = new Camera;
+
 			float l_near, l_far, fov, speed;
 			fscanf_s(SMFile, "%*s %f", &l_near);
 			fscanf_s(SMFile, "%*s %f", &l_far);
@@ -75,6 +77,17 @@ bool SceneManager::Init(char* FileName)
 			m_camera->Init(fov, l_near, l_far, speed);
 			m_camera->calcWorldMatrix();
 			m_camera->calcViewMatrix();
+		}
+		if (strcmp(remark, "#FOG") == 0)
+		{
+			if (m_camera == NULL)
+				m_camera = new Camera;
+			Vector3 fogColor;
+			float fogStart, fogRange;
+			fscanf_s(SMFile, "%*s %f, %f, %f", &fogColor.x, &fogColor.y, &fogColor.z);
+			fscanf_s(SMFile, "%*s %f", &fogStart);
+			fscanf_s(SMFile, "%*s %f", &fogRange);
+			m_camera->initFog(fogColor, fogStart, fogRange);
 		}
 		if (strcmp(remark, "#Objects:") == 0)
 		{

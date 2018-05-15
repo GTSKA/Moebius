@@ -1,24 +1,35 @@
 #pragma once
-#include <d3d11.h>
-#include <D3D11Shader.h>
-struct ShaderVariable
+
+class ID3D11VertexShader;
+class ID3D11PixelShader;
+class ID3D11Buffer;
+class ID3D11Device;
+class ID3D11ShaderReflection;
+class ID3D11InputLayout;
+
+struct ShaderConstVar
 {
-	char Name[50];
-	D3D11_SHADER_VARIABLE_DESC Desc;
+	UINT constantbuffer = -1;
+	UINT offset = 0;
 };
+
 class Shaders
 {
 public:
 	Shaders();
 	~Shaders();
 	unsigned int getId();
-	int Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev, ID3D11DeviceContext* devcon);
-	int Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev, ID3D11DeviceContext* devcon, unsigned int id);
+	int Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev);
+	int Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev, unsigned int id);
 	ID3D11VertexShader* getVertexShader();
 	ID3D11PixelShader* getPixelShader();
 	ID3D11Buffer* getVertexConstBufferbyIndex(unsigned int index);
+	UINT getNumVertexConstBuffer();
+	ID3D11Buffer* getPixelConstBufferbyIndex(unsigned int index);
+	UINT getNumPixelConstBuffer();
 	unsigned int getVSinputsize();
 	void Clean();
+	ID3D11InputLayout* getVertexBufferLayout();
 protected:
 	unsigned int m_Id;
 	int LoadShader(unsigned int Type, char* filename, ID3DBlob** shaderBlob);
@@ -40,14 +51,14 @@ public:
 	UINT positionAttribute;
 	UINT colorAttribute;
 	UINT uvAttribute;
-	UINT uWVP;
-	UINT uworldMatrix;
-	UINT ufogRange;
-	UINT ufogStart;
-	UINT ufogColor;
-	UINT u_camPos;
-	UINT uTilingFactor;
+	ShaderConstVar uWVP;
+	ShaderConstVar uworldMatrix;
+	ShaderConstVar ufogRange;
+	ShaderConstVar ufogStart;
+	ShaderConstVar ufogColor;
+	ShaderConstVar ucamPos;
+	ShaderConstVar uTilingFactor;
 
-	UINT* u_s2DTextures;
+	UINT u2DTexturesCount;
 };
 

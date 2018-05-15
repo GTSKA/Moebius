@@ -1,5 +1,9 @@
 #pragma once
-#include <d3d11.h>
+class ID3D11Texture2D;
+class ID3D11SamplerState;
+class ID3D11ShaderResourceView;
+class ID3D11Device;
+class ID3D11DeviceContext;
 static enum WRAPMODE
 {
 	REPEAT = 1,
@@ -15,8 +19,9 @@ public:
 	bool Init(char* textureName, unsigned int Id, ID3D11Device* dev, ID3D11DeviceContext* devcon);
 	void setWrapMode(WRAPMODE imode);
 	ID3D11ShaderResourceView* getTexture();
+	ID3D11SamplerState* getSampler();
 	//ID3D11ShaderResourceView* getTextureView();
-	ID3D11ShaderResourceView* m_TextureView;
+	
 	unsigned int getId();
 protected:
 	int m_width;
@@ -25,5 +30,7 @@ protected:
 	WRAPMODE m_tiling;
 	ID3D11Texture2D *m_Texture;
 	unsigned int m_Id;
+	ID3D11SamplerState* m_sampler;
+	ID3D11ShaderResourceView* m_TextureView;
 };
 

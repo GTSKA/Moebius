@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "TGA.h"
-
+#include <float.h>
+#include <d3d11.h>
 
 
 Texture::Texture()
@@ -49,7 +50,7 @@ bool Texture::Init(char* textureName, ID3D11Device* dev, ID3D11DeviceContext* de
 		return false;
 	if (m_bpp == 24)
 	{
-		char* bufferTGA2 = (char*)malloc(m_width*m_height * 4);
+		char* bufferTGA2 = new char[m_width*m_height * 4];
 		for (int i = 0; i < m_width*m_height; ++i)
 		{
 			bufferTGA2[i * 4] = bufferTGA[i * 3];
@@ -58,12 +59,11 @@ bool Texture::Init(char* textureName, ID3D11Device* dev, ID3D11DeviceContext* de
 			bufferTGA2[i * 4 + 3] = 255;
 		}
 			
-
 		D3D11_MAPPED_SUBRESOURCE ms;
 		devcon->Map(m_Texture, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);    // map the buffer
 		memcpy(ms.pData, bufferTGA2, m_width*m_height * 4);                 // copy the data
 		devcon->Unmap(m_Texture, NULL);
-		free(bufferTGA2);
+		delete[] bufferTGA2;
 	}
 	else
 	{
@@ -92,8 +92,38 @@ bool Texture::Init(char* textureName, ID3D11Device* dev, ID3D11DeviceContext* de
 		return false;
 
 	//devcon->GenerateMips(m_TextureView);
-	free(bufferTGA);
-	
+	delete[] bufferTGA;
+
+	D3D11_SAMPLER_DESC samplerDesc;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	if (m_tiling == REPEAT)
+	{
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	}
+	if (m_tiling == CLAMP_TO_EDGE)
+	{
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	}
+	if (m_tiling == MIRRORED_REPEAT)
+	{
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+	}
+	samplerDesc.MaxAnisotropy = 8;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.MinLOD = 0.0f;
+	samplerDesc.MaxLOD = FLT_MAX;
+	samplerDesc.MipLODBias = 2.0f;
+	dev->CreateSamplerState(&samplerDesc, &m_sampler);
+
 	return true;
 	
 }
@@ -109,6 +139,10 @@ ID3D11ShaderResourceView* Texture::getTexture()
 	return m_TextureView;
 }
 
+ID3D11SamplerState* Texture::getSampler()
+{
+	return m_sampler;
+}
 unsigned int Texture::getId()
 {
 	return m_Id;

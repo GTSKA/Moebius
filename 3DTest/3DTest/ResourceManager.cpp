@@ -197,7 +197,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				VertexSName[strlen(VertexSName) - 1] = '\0';
 				fscanf_s(RMFile, "%*s \"%s\"", FragmentSName, _countof(FragmentSName));
 				FragmentSName[strlen(FragmentSName) - 1] = '\0';
-				if (m_Shaders[i].Init(VertexSName, FragmentSName, dev, devcon, Id) < 0)
+				if (m_Shaders[i].Init(VertexSName, FragmentSName, dev, Id) < 0)
 				{
 					return false;
 				}

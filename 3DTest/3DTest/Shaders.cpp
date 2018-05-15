@@ -1,10 +1,9 @@
-#include "Shaders.h"
 #include <D3Dcompiler.h>
-
+#include <d3d11.h>
+#include <D3D11Shader.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <tchar.h>
-
+#include "Shaders.h"
 
 Shaders::Shaders()
 {
@@ -12,13 +11,14 @@ Shaders::Shaders()
 	positionAttribute = -1;
 	colorAttribute = -1;
 	uvAttribute = -1;
-	uWVP = -1;
-	uworldMatrix = -1;
-	uTilingFactor = -1;
-	ufogRange = -1;
-	ufogStart = -1;
-	ufogColor = -1;
-	u_camPos = -1;
+	uWVP.constantbuffer = -1;
+	uworldMatrix.constantbuffer = -1;
+	uTilingFactor.constantbuffer = -1;
+	ufogRange.constantbuffer = -1;
+	ufogStart.constantbuffer = -1;
+	ufogColor.constantbuffer = -1;
+	ucamPos.constantbuffer = -1;
+	u2DTexturesCount = 0;
 	//u_s2DTextures = -1;
 }
 
@@ -34,9 +34,9 @@ Shaders::~Shaders()
 }
 void Shaders::Clean()
 {
-	delete[] u_s2DTextures;
+	
 }
-int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev, ID3D11DeviceContext* devcon)
+int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev)
 {
 	if (fileVertexShader == NULL)
 		return -1;
@@ -125,7 +125,7 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 	}
 	
 	dev->CreateInputLayout(layout, numVSinput, VertexShaderBlob->GetBufferPointer(), VertexShaderBlob->GetBufferSize(), &pLayout);
-	devcon->IASetInputLayout(pLayout);
+	
 	delete[] layout;
 
 	m_numVConstBuffer = vertexShaderDesc.ConstantBuffers;
@@ -147,7 +147,7 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 		vertexConstantBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 		hr = dev->CreateBuffer(&vertexConstantBufferDesc, NULL, &m_vertexConstantBuffer[i]);
-		devcon->VSSetConstantBuffers(0, 1, &m_vertexConstantBuffer[i]);
+		
 		if (FAILED(hr))
 			return -4;
 		// Not needed right now
@@ -159,15 +159,18 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 			OutputDebugString(variableDesc.Name);
 			if (strcmp(variableDesc.Name, "WVPMatrix") == 0)
 			{
-				uWVP = j;
+				uWVP.constantbuffer = i;
+				uWVP.offset = variableDesc.StartOffset;
 			}
 			if (strcmp(variableDesc.Name, "wMatrix") == 0)
 			{
-				uworldMatrix = j;
+				uworldMatrix.constantbuffer = i;
+				uworldMatrix.offset = variableDesc.StartOffset;
 			}
 			if (strcmp(variableDesc.Name, "TilingFactor") == 0)
 			{
-				uTilingFactor = j;
+				uTilingFactor.constantbuffer = i;
+				uTilingFactor.offset = variableDesc.StartOffset;
 			}
 		}
 
@@ -204,19 +207,23 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 			OutputDebugString(variableDesc.Name);
 			if (strcmp(variableDesc.Name, "ufogColor") == 0)
 			{
-				ufogColor = variableDesc.StartOffset;
+				ufogColor.constantbuffer = i;
+				ufogColor.offset = variableDesc.StartOffset;
 			}
 			if (strcmp(variableDesc.Name, "ufogStart") == 0)
 			{
-				ufogStart = variableDesc.StartOffset;
+				ufogStart.constantbuffer = i;
+				ufogStart.offset = variableDesc.StartOffset;
 			}
 			if (strcmp(variableDesc.Name, "ufogRange") == 0)
 			{
-				ufogRange = variableDesc.StartOffset;
+				ufogRange.constantbuffer = i;
+				ufogRange.offset = variableDesc.StartOffset;
 			}
 			if (strcmp(variableDesc.Name, "ucamPos") == 0)
 			{
-				u_camPos = variableDesc.StartOffset;
+				ucamPos.constantbuffer = i;
+				ucamPos.offset = variableDesc.StartOffset;
 			}
 		}
 
@@ -229,7 +236,7 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 		OutputDebugString(resourceBindDesc.Name);
 		if (strcmp(resourceBindDesc.Name, "Texture") == 0)
 		{
-			u_s2DTextures = new UINT[resourceBindDesc.BindCount];
+			u2DTexturesCount = resourceBindDesc.BindCount;
 			//uTexture = i;
 		}
 		//p.m_pixelBindings[resourceBindDesc.Name] = resourceBindDesc;
@@ -238,9 +245,17 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 	
 	return 0;
 }
+ID3D11InputLayout* Shaders::getVertexBufferLayout()
+{
+	return pLayout;
+}
 unsigned int Shaders::getVSinputsize()
 {
 	return numVSinput;
+}
+UINT Shaders::getNumVertexConstBuffer()
+{
+	return m_numVConstBuffer;
 }
 ID3D11Buffer* Shaders::getVertexConstBufferbyIndex(unsigned int index)
 {
@@ -248,10 +263,20 @@ ID3D11Buffer* Shaders::getVertexConstBufferbyIndex(unsigned int index)
 		return NULL;
 	return m_vertexConstantBuffer[index];
 }
-int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev, ID3D11DeviceContext* devcon, unsigned int id)
+UINT Shaders::getNumPixelConstBuffer()
+{
+	return m_numPConstBuffer;
+}
+ID3D11Buffer* Shaders::getPixelConstBufferbyIndex(unsigned int index)
+{
+	if (index >= m_numPConstBuffer)
+		return NULL;
+	return m_pixelConstantBuffer[index];
+}
+int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev, unsigned int id)
 {
 	m_Id = id;
-	return Init(fileVertexShader, filePixelShader, dev, devcon);
+	return Init(fileVertexShader, filePixelShader, dev);
 }
 unsigned int Shaders::getId()
 {
