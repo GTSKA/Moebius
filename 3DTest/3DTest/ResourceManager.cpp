@@ -85,6 +85,7 @@ ResourceManager::ResourceManager()
 	m_pInstance = NULL;
 	m_Models = NULL;
 	m_Textures = NULL;
+	m_cubeTextures = NULL;
 	m_Shaders = NULL;
 	m_states = 0;
 }
@@ -113,6 +114,7 @@ ResourceManager::ResourceManager(const ResourceManager &)
 	m_pInstance = NULL;
 	m_Models = NULL;
 	m_Textures = NULL;
+	m_cubeTextures = NULL;
 	m_Shaders = NULL;
 	m_states = 0;
 }
@@ -181,7 +183,21 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 		}
 		if (strcmp(remark, "#Cube_Textures:") == 0)
 		{
-			//TO ADD code later
+			fscanf_s(RMFile, "%d", &m_cubeTextureCount);
+			m_cubeTextures = new Texture[m_cubeTextureCount];
+			for (int i = 0; i < m_cubeTextureCount; ++i)
+			{
+				int id;
+				char textureName[255];
+				fscanf_s(RMFile, "%*s %d", &id);
+				fscanf_s(RMFile, "%*s \"%s\"", textureName, _countof(textureName));
+				textureName[strlen(textureName) - 1] = '\0';
+				m_cubeTextures[i].SetWrapMode(CLAMP_TO_EDGE);//always to avoid weird visual objects
+				if (!m_cubeTextures[i].InitCubeTexture(textureName, id))
+				{
+					return false;
+				}
+			}
 		}
 		if (strcmp(remark, "#Shaders:") == 0)
 		{
@@ -249,6 +265,18 @@ Texture* ResourceManager::GetTextureById(unsigned int id)
 	return NULL;
 }
 
+Texture* ResourceManager::GetCubeTextureById(unsigned int id)
+{
+	for (int i = 0; i < m_cubeTextureCount; ++i)
+	{
+		if (m_cubeTextures[i].getId() == id)
+		{
+			return &m_cubeTextures[i];
+		}
+	}
+	return NULL;
+}
+
 Shaders* ResourceManager::GetShaderById(unsigned int id)
 {
 	for (int i = 0; i < m_shaderCount; ++i)
@@ -284,6 +312,11 @@ void ResourceManager::Clean()
 	{
 		delete[] m_Textures;
 		m_Textures = NULL;
+	}
+	if (m_cubeTextures)
+	{
+		delete[] m_cubeTextures;
+		m_cubeTextures = NULL;
 	}
 	if (m_Shaders)
 	{

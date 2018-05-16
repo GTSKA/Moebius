@@ -17,6 +17,8 @@ public:
 	~Texture();
 	bool Init(char* textureName, ID3D11Device* dev, ID3D11DeviceContext* devcon);
 	bool Init(char* textureName, unsigned int Id, ID3D11Device* dev, ID3D11DeviceContext* devcon);
+	bool InitCubeTexture(char* textureName, ID3D11Device* dev, ID3D11DeviceContext* devcon);
+	bool InitCubeTexture(char* textureName, unsigned int Id, ID3D11Device* dev, ID3D11DeviceContext* devcon);
 	void setWrapMode(WRAPMODE imode);
 	ID3D11ShaderResourceView* getTexture();
 	ID3D11SamplerState* getSampler();
@@ -32,5 +34,6 @@ protected:
 	unsigned int m_Id;
 	ID3D11SamplerState* m_sampler;
 	ID3D11ShaderResourceView* m_TextureView;
+	bool ExtractFace(int hOffset, int vOffset, const char* bufferTGA, char** face);
 };
 

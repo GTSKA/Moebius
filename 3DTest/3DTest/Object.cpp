@@ -164,10 +164,6 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 		devcon->PSSetConstantBuffers(0, 1, &PSConstBuffer);
 	}
 	
-	
-	
-	
-	
 	if(m_Shader->u2DTexturesCount > 0)
 	{
 		ID3D11ShaderResourceView **textures = new ID3D11ShaderResourceView*[m_Shader->u2DTexturesCount];
