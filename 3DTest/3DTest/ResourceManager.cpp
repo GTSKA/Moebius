@@ -192,8 +192,8 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				fscanf_s(RMFile, "%*s %d", &id);
 				fscanf_s(RMFile, "%*s \"%s\"", textureName, _countof(textureName));
 				textureName[strlen(textureName) - 1] = '\0';
-				m_cubeTextures[i].SetWrapMode(CLAMP_TO_EDGE);//always to avoid weird visual objects
-				if (!m_cubeTextures[i].InitCubeTexture(textureName, id))
+				m_cubeTextures[i].setWrapMode(REPEAT);//always to avoid weird visual objects
+				if (!m_cubeTextures[i].InitCubeTexture(textureName, id,dev,devcon))
 				{
 					return false;
 				}

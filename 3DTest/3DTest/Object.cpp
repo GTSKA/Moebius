@@ -31,12 +31,13 @@ bool Object::Init(unsigned int ID, unsigned modelID, TextureInit* textures2D, Te
 	{
 		m_Textures[i] = ResourceManager::GetInstance()->GetTextureById(textures2D->m_textureIDs[i]);
 	}
+
 	m_CubeTexturesCount = cubicTextures->m_textureCount;
-	//to be implemented later
-	//for (int i = 0; i < m_CubeTextureCount; ++i)
-	//{
-	//	m_CubeTextures[i] = ResourceManager::GetInstance()->GetCubicTextureById(cubicTextures->m_textureIds[i]);
-	//}
+	m_CubeTextures = new Texture*[m_CubeTexturesCount];
+	for (int i = 0; i < m_CubeTexturesCount; ++i)
+	{
+		m_CubeTextures[i] = ResourceManager::GetInstance()->GetCubeTextureById(cubicTextures->m_textureIDs[i]);
+	}
 	m_Shader = ResourceManager::GetInstance()->GetShaderById(shaderID);
 	m_position = *position;
 	m_rotation = *rotation;
@@ -178,6 +179,22 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 		devcon->PSSetSamplers(0, textureUnit, samplers);
 		devcon->PSSetShaderResources(0, textureUnit, textures);
 		delete[] textures;
+		delete[] samplers;
+	}
+	if (m_Shader->uCubeTexturesCount > 0)
+	{
+		ID3D11ShaderResourceView** cubeTextures = new ID3D11ShaderResourceView*[m_Shader->uCubeTexturesCount];
+		ID3D11SamplerState** samplers = new ID3D11SamplerState*[m_Shader->uCubeTexturesCount];
+		UINT textureUnit = 0;
+		while (textureUnit < m_Shader->uCubeTexturesCount)
+		{
+			cubeTextures[textureUnit] = m_CubeTextures[textureUnit]->getTexture();
+			samplers[textureUnit] = m_CubeTextures[textureUnit]->getSampler();
+			textureUnit++;
+		}
+		devcon->PSSetSamplers(0, textureUnit, samplers);
+		devcon->PSSetShaderResources(0, textureUnit, cubeTextures);
+		delete[] cubeTextures;
 		delete[] samplers;
 	}
 

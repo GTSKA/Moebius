@@ -60,5 +60,6 @@ public:
 	ShaderConstVar uTilingFactor;
 
 	UINT u2DTexturesCount;
+	UINT uCubeTexturesCount;
 };
 

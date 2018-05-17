@@ -19,7 +19,8 @@ Shaders::Shaders()
 	ufogColor.constantbuffer = -1;
 	ucamPos.constantbuffer = -1;
 	u2DTexturesCount = 0;
-	//u_s2DTextures = -1;
+	uCubeTexturesCount = 0;
+
 }
 
 
@@ -237,9 +238,11 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 		if (strcmp(resourceBindDesc.Name, "Texture") == 0)
 		{
 			u2DTexturesCount = resourceBindDesc.BindCount;
-			//uTexture = i;
 		}
-		//p.m_pixelBindings[resourceBindDesc.Name] = resourceBindDesc;
+		if(strcmp(resourceBindDesc.Name, "SkyMap") == 0)
+		{
+			uCubeTexturesCount = resourceBindDesc.BindCount;
+		}
 	}
 
 	

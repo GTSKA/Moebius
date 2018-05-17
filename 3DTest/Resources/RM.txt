@@ -1,10 +1,14 @@
-#Models: 3
+#Models: 5
 ID 0
 FILE "../Resources/Models/Woman2.nfg"
 ID 1
 FILE "../Resources/Models/Woman1.nfg"
 ID 2
 FILE "../Resources/Models/Terrain.nfg"
+ID 3
+FILE "..\Resources\Models\SkyBox.nfg"
+ID 4
+FILE "..\Resources\Models\Bila.nfg"
 
 #2D_Textures: 6
 ID 0
@@ -26,13 +30,20 @@ ID 5
 FILE "../Resources/Textures/Terrain_blend_map.tga"
 MODE GL_REPEAT
 
-#Shaders: 2
+#Cube_Textures: 1
+ID 0
+FILE "..\Resources\Textures\envMap.tga"
+
+#Shaders: 3
 ID 0
 VS "../Resources/Shaders/TriangleShaderVS.hlsl"
 FS "../Resources/Shaders/TriangleShaderPS.glsl"
 ID 1
 VS "../Resources/Shaders/TerrainShaderVS.hlsl"
 FS "../Resources/Shaders/TerrainShaderPS.glsl"
+ID 2
+VS "..\Resources\Shaders\CubeMapVS.hlsl"
+FS "..\Resources\Shaders\CubeMapPS.glsl"
 
 STATES 2
 GL_CULL_FACE

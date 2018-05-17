@@ -1,6 +1,5 @@
 #include "Texture.h"
 #include "TGA.h"
-#include <float.h>
 #include <d3d11.h>
 
 
@@ -108,13 +107,14 @@ bool Texture::Init(char* textureName, ID3D11Device* dev, ID3D11DeviceContext* de
 		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
 		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
 	}
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	samplerDesc.MaxAnisotropy = 8;
 	samplerDesc.BorderColor[0] = 1.0f;
 	samplerDesc.BorderColor[0] = 1.0f;
 	samplerDesc.BorderColor[0] = 1.0f;
 	samplerDesc.BorderColor[0] = 1.0f;
 	samplerDesc.MinLOD = 0.0f;
-	samplerDesc.MaxLOD = FLT_MAX;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	samplerDesc.MipLODBias = 2.0f;
 	dev->CreateSamplerState(&samplerDesc, &m_sampler);
 
@@ -126,17 +126,18 @@ bool Texture::InitCubeTexture(char* textureName, ID3D11Device* dev, ID3D11Device
 	char* bufferTGA = LoadTGA(textureName, &m_width, &m_height, &m_bpp);
 	D3D11_TEXTURE2D_DESC desc;
 	ZeroMemory(&desc, sizeof(desc));
-	desc.Width = m_width;
-	desc.Height = m_height;
-	desc.MipLevels = desc.ArraySize = 1;
+	desc.Width = m_width/4;
+	desc.Height = m_height/3;
+	desc.MipLevels  = 1;
 	desc.ArraySize = 6;
-
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
-	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	
 	char* faces[6];
 	
 	D3D11_SUBRESOURCE_DATA pData[6];
@@ -161,16 +162,23 @@ bool Texture::InitCubeTexture(char* textureName, ID3D11Device* dev, ID3D11Device
 	}
 	for (int i = 0; i < 6; ++i)
 	{
-		pData[i].pSysMem = faces[i];
 		pData[i].SysMemPitch = m_width;
 		pData[i].SysMemSlicePitch = 0;
-
 	}
+	//according to DirectX accomodation https://msdn.microsoft.com/en-us/library/windows/desktop/bb204881(v=vs.85).aspx
+	pData[0].pSysMem = faces[3];
+	pData[1].pSysMem = faces[1];
+	pData[2].pSysMem = faces[
+		0];
+	pData[3].pSysMem = faces[5];
+	pData[4].pSysMem = faces[2];
+	pData[5].pSysMem = faces[4];
 
 	HRESULT hr = dev->CreateTexture2D(&desc, pData, &m_Texture);
 	if (FAILED(hr))
 		return false;
-
+	for (int i = 5; i >=0;--i)
+		delete[] faces[i];
 	delete[] bufferTGA;
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	ZeroMemory(&srvDesc, sizeof(srvDesc));
@@ -183,6 +191,41 @@ bool Texture::InitCubeTexture(char* textureName, ID3D11Device* dev, ID3D11Device
 	hr = dev->CreateShaderResourceView(m_Texture, &srvDesc, &m_TextureView);
 	if (FAILED(hr))
 		return false;
+
+	D3D11_SAMPLER_DESC samplerDesc;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	if (m_tiling == REPEAT)
+	{
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	}
+	if (m_tiling == CLAMP_TO_EDGE)
+	{
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	}
+	if (m_tiling == MIRRORED_REPEAT)
+	{
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+	}
+	samplerDesc.MaxAnisotropy = 8;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.MinLOD = 0.0f;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	samplerDesc.MipLODBias = 2.0f;
+	dev->CreateSamplerState(&samplerDesc, &m_sampler);
+
+
+
+
+
 	return true;
 }
 bool Texture::InitCubeTexture(char* textureName, unsigned int Id, ID3D11Device* dev, ID3D11DeviceContext* devcon)
@@ -200,12 +243,12 @@ bool Texture::ExtractFace(int hOffset, int vOffset, const char* bufferTGA, char*
 	*face = new char[offsetSizeW * offsetSizeH * 4];
 	int lineSize = offsetSizeW * (m_bpp / 8);
 	buffer2TGA = new char[bufferSize];
-	int face;
 	errno_t err;
 
 	for (int i = 0; i < offsetSizeH; ++i)
 	{
-		int bufferOffset = (vOffset * offsetSizeW + i)* m_width *(m_bpp / 8);
+		int bufferOffset = (vOffset * offsetSizeH + i)* m_width + (hOffset*offsetSizeW);
+		bufferOffset *= (m_bpp / 8);
 		rsize_t size = bufferSize - offset;
 		err = memcpy_s(buffer2TGA + offset, size, bufferTGA + bufferOffset, lineSize);
 		if (err)
@@ -213,33 +256,35 @@ bool Texture::ExtractFace(int hOffset, int vOffset, const char* bufferTGA, char*
 			return false;
 		}
 		offset += lineSize;
-		if (m_bpp == 24)//why 24? 8 * 3, so 3 bytes, but the else is not the only case
-		{
-			char* bufferTGA2 = new char[offsetSizeW * offsetSizeH * 4];
+	}
+	if (m_bpp == 24)//why 24? 8 * 3, so 3 bytes, but the else is not the only case
+	{
+		char* bufferTGA2 = new char[offsetSizeW * offsetSizeH * 4];
 			
-			for (int i = 0; i < offsetSizeW*offsetSizeH; ++i)
-			{
-				bufferTGA2[i * 4] = buffer2TGA[i * 3];
-				bufferTGA2[i * 4 + 1] = buffer2TGA[i * 3 + 1];
-				bufferTGA2[i * 4 + 2] = buffer2TGA[i * 3 + 2];
-				bufferTGA2[i * 4 + 3] = 255;
-
-				memcpy(*face, bufferTGA2, offsetSizeW*offsetSizeH * 4);
-			}
-		}
-		else
+		for (int k = 0; k < offsetSizeW * offsetSizeH; ++k)
 		{
-			if (m_bpp > 24)
-			{
-				//there is only one case RGBA
-				memcpy(*face, buffer2TGA, offsetSizeW*offsetSizeH * 4);
-			}
-			if (m_bpp < 24)
-			{
-				//TO DO:
-			}
+			bufferTGA2[k * 4] = buffer2TGA[k * 3];
+			bufferTGA2[k * 4 + 1] = buffer2TGA[k * 3 + 1];
+			bufferTGA2[k * 4 + 2] = buffer2TGA[k * 3 + 2];
+			bufferTGA2[k * 4 + 3] = 255;
+		}
+		memcpy(*face, bufferTGA2, offsetSizeW * offsetSizeH * 4);
+		delete[] bufferTGA2;
+	}
+	else
+	{
+		if (m_bpp > 24)
+		{
+			//there is only one case RGBA
+			memcpy(*face, buffer2TGA, offsetSizeW * offsetSizeH * 4);
+		}
+		if (m_bpp < 24)
+		{
+			//TO DO:
 		}
 	}
+	delete[] buffer2TGA;
+	return true;
 }
 
 void Texture::setWrapMode(WRAPMODE imode)
