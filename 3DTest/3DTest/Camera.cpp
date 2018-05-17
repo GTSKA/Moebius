@@ -3,8 +3,8 @@
 
 Camera::Camera()
 {
-	m_positionInfo = Vector3(0.0, 5.0, -5.0);
-	m_rotateInfo = Vector3(0, 0, 0);
+	m_positionInfo = Vector3(0.0, 5.0, 5.0);
+	m_rotateInfo = Vector3(0, M_PI, 0);
 }
 
 
@@ -36,12 +36,12 @@ void Camera::calcWorldMatrix()
 	Matrix camRotationXMatrix;
 	Matrix camRotationYMatrix;
 	Matrix camTranslationMatrix;
-
+	
 	
 	camRotationXMatrix.SetIdentity();
 	camRotationYMatrix.SetIdentity();
 	camTranslationMatrix.SetIdentity();
-
+	
 	
 	camRotationXMatrix.SetRotationX(m_rotateInfo.x);
 	camRotationYMatrix.SetRotationY(m_rotateInfo.y);
@@ -73,7 +73,7 @@ void Camera::moveForward(float deltaTime)
 
 	worldMatrix = getWorldMatrix();
 
-	moveL = Vector4(0, 0, -deltaTime*Globals::SPEED_CAM, 1);
+	moveL = Vector4(0, 0, deltaTime*Globals::SPEED_CAM, 1);
 	moveW = moveL * worldMatrix;
 
 	m_positionInfo = m_positionInfo + moveW.xyz();
@@ -89,7 +89,7 @@ void Camera::moveBackward(float deltaTime)
 
 	worldMatrix = getWorldMatrix();
 
-	moveL = Vector4(0, 0, deltaTime*Globals::SPEED_CAM, 1);
+	moveL = Vector4(0, 0, -deltaTime*Globals::SPEED_CAM, 1);
 	moveW = moveL * worldMatrix;
 
 	m_positionInfo = m_positionInfo + moveW.xyz();

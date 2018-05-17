@@ -168,8 +168,7 @@ bool Texture::InitCubeTexture(char* textureName, ID3D11Device* dev, ID3D11Device
 	//according to DirectX accomodation https://msdn.microsoft.com/en-us/library/windows/desktop/bb204881(v=vs.85).aspx
 	pData[0].pSysMem = faces[3];
 	pData[1].pSysMem = faces[1];
-	pData[2].pSysMem = faces[
-		0];
+	pData[2].pSysMem = faces[0];
 	pData[3].pSysMem = faces[5];
 	pData[4].pSysMem = faces[2];
 	pData[5].pSysMem = faces[4];

@@ -75,7 +75,7 @@ void Object::CalcWorldMatrix()
 }
 void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 {
-	ResourceManager::GetInstance()->EnableStates();
+	m_Shader->EnableStates(devcon);
 	devcon->VSSetShader(m_Shader->getVertexShader(), 0, 0);
 	devcon->PSSetShader(m_Shader->getPixelShader(), 0, 0);
 	for (int i = 0; i < m_Shader->getNumVertexConstBuffer(); ++i)
@@ -119,27 +119,37 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 	}
 	if (m_Shader->colorAttribute != -1)
 	{
-		offset = 12;
+		offset = 3*sizeof(float);
 		devcon->IASetVertexBuffers(m_Shader->colorAttribute, 1, &(m_model->m_vertexBuffer), &stride, &offset);
+	}
+	if (m_Shader->normalAttribute != -1)
+	{
+		offset = 7*sizeof(float);
+		devcon->IASetVertexBuffers(m_Shader->normalAttribute, 1, &(m_model->m_vertexBuffer), &stride, &offset);
 	}
 	if (m_Shader->uvAttribute != -1)
 	{
-		offset = 64;
+		offset = 16*sizeof(float);
 		devcon->IASetVertexBuffers(m_Shader->uvAttribute, 1, &(m_model->m_vertexBuffer), &stride, &offset);
 	}
+	
 
 
 	for (int i = 0; i < m_Shader->getNumPixelConstBuffer(); ++i)
 	{
 		ID3D11Buffer* PSConstBuffer = m_Shader->getPixelConstBufferbyIndex(i);
-		
+		devcon->PSSetConstantBuffers(0, 1, &PSConstBuffer);
 		D3D11_MAPPED_SUBRESOURCE ms;
 		devcon->Map(PSConstBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);    // map the buffer
 		if (m_Shader->ucamPos.constantbuffer == i)
 		{
 			char* dst = (char*)ms.pData;
 			dst+= m_Shader->ucamPos.offset;
-			memcpy((void*)(dst + m_Shader->ucamPos.offset), &cam->getPosition(), 3 * sizeof(float));                 // copy the data
+			float camPos[3];
+			camPos[0] = cam->getPosition().x;
+			camPos[1] = cam->getPosition().y;
+			camPos[2] = cam->getPosition().z;
+			memcpy(dst, camPos, 3 * sizeof(float));                 // copy the data
 		}
 		if (m_Shader->ufogColor.constantbuffer == i)
 		{
@@ -162,7 +172,7 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 			memcpy(dst, &fogRange, sizeof(float));                 // copy the data
 		}
 		devcon->Unmap(PSConstBuffer, NULL);
-		devcon->PSSetConstantBuffers(0, 1, &PSConstBuffer);
+		
 	}
 	
 	if(m_Shader->u2DTexturesCount > 0)
@@ -201,7 +211,7 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 	devcon->IASetIndexBuffer(m_model->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 	devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	devcon->DrawIndexed(m_model->getIndexSize(), 0, 0);
-	ResourceManager::GetInstance()->DisableStates();
+	
 }
 void Object::Clean()
 {

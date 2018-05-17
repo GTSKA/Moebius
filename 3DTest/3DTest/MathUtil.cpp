@@ -537,7 +537,7 @@ Matrix & Matrix::SetPerspective(GLfloat fovY, GLfloat aspect, GLfloat nearPlane,
 	m[1][2] = 0;
 	m[2][2] = (farPlane + nearPlane) * rcpnmf;
 	m[2][2] = -1.0f*farPlane * rcpnmf;
-	m[3][2] = farPlane * rcpnmf * n2;
+	m[3][2] = farPlane * nearPlane * rcpnmf ;
 	//m[3][2] = farPlane*nearPlane * rcpnmf;
 
 	m[0][3] = 0;

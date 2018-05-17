@@ -6,6 +6,8 @@ class ID3D11Buffer;
 class ID3D11Device;
 class ID3D11ShaderReflection;
 class ID3D11InputLayout;
+class ID3D11RasterizerState;
+class ID3D11DeviceContext;
 
 struct ShaderConstVar
 {
@@ -30,6 +32,9 @@ public:
 	unsigned int getVSinputsize();
 	void Clean();
 	ID3D11InputLayout* getVertexBufferLayout();
+	void EnableStates(ID3D11DeviceContext* devcon);
+	void DisableStates(ID3D11DeviceContext* devcon);
+	bool InitRasterizerState(D3D11_RASTERIZER_DESC* rasterizerDesc, ID3D11Device* dev);
 protected:
 	unsigned int m_Id;
 	int LoadShader(unsigned int Type, char* filename, ID3DBlob** shaderBlob);
@@ -37,13 +42,14 @@ protected:
 	ID3D11VertexShader *m_VertexShader;    // the vertex shader
 	ID3D11PixelShader *m_PixelShader;     // the pixel shader
 	ID3D11InputLayout *pLayout;
-	unsigned int numVSinput;
+	UINT numVSinput;
 	ID3D11ShaderReflection* VertexShaderReflector;
 	ID3D11ShaderReflection* PixelShaderReflector;
 	ID3D11Buffer** m_vertexConstantBuffer;
-	unsigned int m_numVConstBuffer;
+	ID3D11RasterizerState* m_RasterizerState;
+	UINT m_numVConstBuffer;
 	ID3D11Buffer** m_pixelConstantBuffer;
-	unsigned int m_numPConstBuffer;
+	UINT m_numPConstBuffer;
 	//D3D11_SHADER_VARIABLE_DESC m_variableDesc;
 	//ShaderVariable* m_vertexVariables;
 	//ShaderVariable* m_pixelVariables;
@@ -51,6 +57,7 @@ public:
 	UINT positionAttribute;
 	UINT colorAttribute;
 	UINT uvAttribute;
+	UINT normalAttribute;
 	ShaderConstVar uWVP;
 	ShaderConstVar uworldMatrix;
 	ShaderConstVar ufogRange;

@@ -11,6 +11,7 @@ Shaders::Shaders()
 	positionAttribute = -1;
 	colorAttribute = -1;
 	uvAttribute = -1;
+	normalAttribute = -1;
 	uWVP.constantbuffer = -1;
 	uworldMatrix.constantbuffer = -1;
 	uTilingFactor.constantbuffer = -1;
@@ -36,6 +37,21 @@ Shaders::~Shaders()
 void Shaders::Clean()
 {
 	
+}
+
+void Shaders::EnableStates(ID3D11DeviceContext* devcon)
+{
+	devcon->RSSetState(m_RasterizerState);
+}
+
+void Shaders::DisableStates(ID3D11DeviceContext* devcon)
+{
+	
+}
+
+bool Shaders::InitRasterizerState(D3D11_RASTERIZER_DESC* rasterizerDesc, ID3D11Device* dev)
+{
+	return !FAILED(dev->CreateRasterizerState(rasterizerDesc, &m_RasterizerState));
 }
 int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev)
 {
@@ -93,6 +109,10 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 		{
 			//offset += 8;
 			uvAttribute = i;
+		}
+		if (strcmp(resourceBindDesc.SemanticName, "NORMAL") == 0)
+		{
+			normalAttribute = i;
 		}
 		
 		if (resourceBindDesc.Mask == 1)

@@ -87,7 +87,6 @@ ResourceManager::ResourceManager()
 	m_Textures = NULL;
 	m_cubeTextures = NULL;
 	m_Shaders = NULL;
-	m_states = 0;
 }
 
 
@@ -116,7 +115,6 @@ ResourceManager::ResourceManager(const ResourceManager &)
 	m_Textures = NULL;
 	m_cubeTextures = NULL;
 	m_Shaders = NULL;
-	m_states = 0;
 }
 
 bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContext* devcon)
@@ -217,25 +215,52 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				{
 					return false;
 				}
+				int stateCount;
+				fscanf_s(RMFile, "%*s %d", &stateCount);
+				D3D11_RASTERIZER_DESC rasterizerDesc;
+				rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+				rasterizerDesc.CullMode = D3D11_CULL_BACK;
+				rasterizerDesc.FrontCounterClockwise = FALSE;
+				rasterizerDesc.DepthClipEnable = TRUE;
+				rasterizerDesc.ScissorEnable = FALSE;
+				rasterizerDesc.AntialiasedLineEnable = FALSE;
+				rasterizerDesc.MultisampleEnable = FALSE;
+				rasterizerDesc.DepthBias = 0;
+				rasterizerDesc.DepthBiasClamp = 0.0f;
+				rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+				for (int i = 0; i < stateCount; ++i)
+				{
+					char state[50];
+					fscanf_s(RMFile, "%s", state, _countof(state));
+					if (strcmp(state, "D3D11_FILL_WIREFRAME") == 0)
+						rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+					else if (strcmp(state, "D3D11_FILL_SOLID") == 0)
+						rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+					else if (strcmp(state, "D3D11_CULL_NONE") == 0)
+						rasterizerDesc.CullMode = D3D11_CULL_NONE;
+					else if (strcmp(state, "D3D11_CULL_FRONT") == 0)
+						rasterizerDesc.CullMode = D3D11_CULL_FRONT;
+					else if (strcmp(state, "D3D11_CULL_BACK") == 0)
+						rasterizerDesc.CullMode = D3D11_CULL_BACK;
+					else if (strcmp(state, "SCISSOR_ENABLE") == 0)
+						rasterizerDesc.ScissorEnable = TRUE;
+					else if (strcmp(state, "SCISSOR_DISABLE") == 0)
+						rasterizerDesc.ScissorEnable = FALSE;
+					else if (strcmp(state, "MULTISAMPLE_ENABLED") == 0)
+						rasterizerDesc.MultisampleEnable = TRUE;
+					else if (strcmp(state, "MULTISAMPLE_DISABLED") == 0)
+						rasterizerDesc.MultisampleEnable = FALSE;
+				}
+				if (!m_Shaders[i].InitRasterizerState(&rasterizerDesc, dev))
+				{
+					OutputDebugString("Error generatin Rasterizer State");
+					return false;
+				}
 			}
 		}
 		if (strcmp(remark, "STATES") == 0)
 		{
-			fscanf_s(RMFile, "%d", &m_statesCount);
-			m_states = new unsigned int[m_statesCount];
-			for (int i = 0; i < m_statesCount; ++i)
-			{
-				char state[50];
-				fscanf_s(RMFile, "%s", state, _countof(state));
-				if (strcmp(state, "GL_CULL_FACE") == 0)
-				{
-					m_states[i] = GL_CULL_FACE;
-				}
-				if (strcmp(state, "GL_DEPTH_TEST") == 0)
-				{
-					m_states[i] = GL_DEPTH_TEST;
-				}
-			}
+			
 		}
 	}
 	return true;
@@ -289,20 +314,20 @@ Shaders* ResourceManager::GetShaderById(unsigned int id)
 	return NULL;
 }
 
-void ResourceManager::EnableStates() 
+/*void ResourceManager::EnableStates() 
 {
 }
 void ResourceManager::DisableStates()
 {
-}
+}*/
 
 void ResourceManager::Clean()
 {
-	if (m_states)
+	/*if (m_states)
 	{
 		delete[] m_states;
 		m_states = NULL;
-	}
+	}*/
 	if (m_Models)
 	{
 		delete[] m_Models;

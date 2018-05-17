@@ -20,8 +20,6 @@ public:
 	Texture* GetTextureById(unsigned int id);
 	Texture* GetCubeTextureById(unsigned int id);
 	Shaders* GetShaderById(unsigned int id);
-	void EnableStates();
-	void DisableStates();
 	void Clean();
 
 
@@ -35,7 +33,7 @@ protected:
 	Texture* m_cubeTextures;
 	int m_shaderCount;
 	Shaders* m_Shaders;
-	int m_statesCount;
-	unsigned int *m_states;
+	//int m_statesCount;
+	//unsigned int *m_states;
 };
 

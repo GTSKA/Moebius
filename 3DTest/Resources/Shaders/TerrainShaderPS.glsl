@@ -1,9 +1,12 @@
 Texture2D Texture[4];
 SamplerState ss[4];
+cbuffer ConstantBuffer
+{
 float3 ufogColor;
 float ufogStart;
 float ufogRange;
-float ucamPos : POSITION;
+float3 ucamPos : POSITION;
+}
 struct PS_In
 {
 	float2 uv : TEXCOORD0;
@@ -29,5 +32,4 @@ float4 PShader(PS_In input) : SV_TARGET
 	float factor = clamp((distanceToCamera - ufogStart)/ufogRange, 0.0f, 1.0f);
 	float4 colorFinal = lerp(ColorTerrain, fogColor, factor);
 	return colorFinal;
-	//return float4(fogColor.z,fogColor.z,fogColor.z,1.0);
 }

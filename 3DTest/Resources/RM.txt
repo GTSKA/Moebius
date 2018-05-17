@@ -34,17 +34,23 @@ MODE GL_REPEAT
 ID 0
 FILE "..\Resources\Textures\envMap.tga"
 
-#Shaders: 3
+#Shaders: 4
 ID 0
 VS "../Resources/Shaders/TriangleShaderVS.hlsl"
 FS "../Resources/Shaders/TriangleShaderPS.glsl"
+STATES 0
 ID 1
 VS "../Resources/Shaders/TerrainShaderVS.hlsl"
 FS "../Resources/Shaders/TerrainShaderPS.glsl"
+STATES 0
 ID 2
 VS "..\Resources\Shaders\CubeMapVS.hlsl"
 FS "..\Resources\Shaders\CubeMapPS.glsl"
+STATES 1
+D3D11_CULL_NONE
+ID 3
+VS "..\Resources\Shaders\EnvReflectVS.hlsl"
+FS "..\Resources\Shaders\EnvReflectPS.glsl"
+STATES 0
 
-STATES 2
-GL_CULL_FACE
-GL_DEPTH_TEST
+
