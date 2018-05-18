@@ -1,8 +1,8 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <d3d11.h>
-#include <d3dx11.h>
-#include <d3dx10.h>
+//#include <d3dx11.h>
+//#include <d3dx10.h>
 #include <cstdio>
 #include "MemoryOperators.h"
 #include "Vertex.h"
@@ -20,8 +20,8 @@ using namespace std;
 
 //include Direct3D Library file
 #pragma comment (lib, "d3d11.lib")
-#pragma comment(lib, "d3dx11.lib")
-#pragma comment(lib, "d3dx10.lib")
+//#pragma comment(lib, "d3dx11.lib")
+//#pragma comment(lib, "d3dx10.lib")
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
 
@@ -493,53 +493,53 @@ HRESULT InitPipeline()
 {
 	HRESULT hr;
 	hr = S_OK;
-	//load and compile the two shaders
-	ID3D10Blob *VS, *PS;
-	ID3D10Blob *VSerror, *PSerror;
-	hr = D3DX11CompileFromFile("shaders.shader", 0, 0, "VShader", "vs_4_0", 0, 0, 0, &VS, &VSerror, 0);
-	if (FAILED(hr))
-	{
-		OutputDebugStringA((char*)VSerror->GetBufferPointer());
-		return hr;
-	}
-	hr = D3DX11CompileFromFile("shaders.shader", 0, 0, "PShader", "ps_4_0", 0, 0, 0, &PS, &PSerror, 0);
+	////load and compile the two shaders
+	//ID3D10Blob *VS, *PS;
+	//ID3D10Blob *VSerror, *PSerror;
+	//hr = D3DX11CompileFromFile("shaders.shader", 0, 0, "VShader", "vs_4_0", 0, 0, 0, &VS, &VSerror, 0);
+	//if (FAILED(hr))
+	//{
+	//	OutputDebugStringA((char*)VSerror->GetBufferPointer());
+	//	return hr;
+	//}
+	//hr = D3DX11CompileFromFile("shaders.shader", 0, 0, "PShader", "ps_4_0", 0, 0, 0, &PS, &PSerror, 0);
 
-	//Encapsulate both shaders into shader objects
-	dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
-	dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
+	////Encapsulate both shaders into shader objects
+	//dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
+	//dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
 
-	//set the shader objects
-	devcon->VSSetShader(pVS, 0, 0);
-	devcon->PSSetShader(pPS, 0, 0);
+	////set the shader objects
+	//devcon->VSSetShader(pVS, 0, 0);
+	//devcon->PSSetShader(pPS, 0, 0);
 
-	// create the input layout object
-	D3D11_INPUT_ELEMENT_DESC ied[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,64,D3D11_INPUT_PER_VERTEX_DATA,0},
-	};
-	dev->CreateInputLayout(ied, 3, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
-	devcon->IASetInputLayout(pLayout);
+	//// create the input layout object
+	//D3D11_INPUT_ELEMENT_DESC ied[] =
+	//{
+	//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//	{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,64,D3D11_INPUT_PER_VERTEX_DATA,0},
+	//};
+	//dev->CreateInputLayout(ied, 3, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
+	//devcon->IASetInputLayout(pLayout);
 
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
+	//D3D11_BUFFER_DESC bd;
+	//ZeroMemory(&bd, sizeof(bd));
 
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = 64;
-	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//bd.Usage = D3D11_USAGE_DEFAULT;
+	//bd.ByteWidth = 64;
+	//bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-	dev->CreateBuffer(&bd, NULL, &pCBuffer);
-	devcon->VSSetConstantBuffers(0, 1, &pCBuffer);
+	//dev->CreateBuffer(&bd, NULL, &pCBuffer);
+	//devcon->VSSetConstantBuffers(0, 1, &pCBuffer);
 
-	D3D11_RASTERIZER_DESC rd;
-	// set the rasterizer properties here
-	//rd.CullMode = D3D11_CULL_NONE;
-	//rd.DepthClipEnable = FALSE;
-	rd.FillMode = D3D11_FILL_SOLID;
-	rd.CullMode = D3D11_CULL_FRONT;
-	rd.FrontCounterClockwise = FALSE;
-	dev->CreateRasterizerState(&rd, &pRS);
+	//D3D11_RASTERIZER_DESC rd;
+	//// set the rasterizer properties here
+	////rd.CullMode = D3D11_CULL_NONE;
+	////rd.DepthClipEnable = FALSE;
+	//rd.FillMode = D3D11_FILL_SOLID;
+	//rd.CullMode = D3D11_CULL_FRONT;
+	//rd.FrontCounterClockwise = FALSE;
+	//dev->CreateRasterizerState(&rd, &pRS);
 
 	
 	return hr;
@@ -600,7 +600,8 @@ HRESULT InitGraphics()
 }
 void Draw()
 {
-	devcon->ClearRenderTargetView(backbuffer, D3DXCOLOR(0.0f, 0.2f, 0.4f, 1.0f));
+	float color[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	devcon->ClearRenderTargetView(backbuffer, color);
 	devcon->ClearDepthStencilView(pDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	//Matrix scaleMatrix;
