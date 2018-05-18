@@ -19,9 +19,10 @@ Shaders::Shaders()
 	ufogStart.constantbuffer = -1;
 	ufogColor.constantbuffer = -1;
 	ucamPos.constantbuffer = -1;
+	uTime.constantbuffer = -1;
 	u2DTexturesCount = 0;
 	uCubeTexturesCount = 0;
-
+	m_BlendState = NULL;
 }
 
 
@@ -33,6 +34,17 @@ Shaders::~Shaders()
 	PixelShaderReflector->Release();
 	m_VertexShader->Release();
 	m_PixelShader->Release();
+	for (int i = 0; i < m_numVConstBuffer; ++i)
+		m_vertexConstantBuffer[i]->Release();
+	delete[] m_vertexConstantBuffer;
+	for (int i = 0; i < m_numPConstBuffer; ++i)
+		m_pixelConstantBuffer[i]->Release();
+	delete[] m_pixelConstantBuffer;
+
+	if (m_BlendState)
+		m_BlendState->Release();
+	m_RasterizerState->Release();
+	pLayout->Release();
 }
 void Shaders::Clean()
 {
@@ -40,8 +52,10 @@ void Shaders::Clean()
 }
 
 void Shaders::EnableStates(ID3D11DeviceContext* devcon)
-{
+{	
 	devcon->RSSetState(m_RasterizerState);
+	if (m_BlendState)
+		devcon->OMSetBlendState(m_BlendState, 0, 0xffffff);
 }
 
 void Shaders::DisableStates(ID3D11DeviceContext* devcon)
@@ -52,6 +66,21 @@ void Shaders::DisableStates(ID3D11DeviceContext* devcon)
 bool Shaders::InitRasterizerState(D3D11_RASTERIZER_DESC* rasterizerDesc, ID3D11Device* dev)
 {
 	return !FAILED(dev->CreateRasterizerState(rasterizerDesc, &m_RasterizerState));
+}
+void Shaders::InitBlendState(ID3D11Device* dev)
+{
+	D3D11_BLEND_DESC blendDesc;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.IndependentBlendEnable = FALSE;
+	blendDesc.AlphaToCoverageEnable = FALSE;
+	dev->CreateBlendState(&blendDesc, &m_BlendState);
 }
 int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev)
 {
@@ -245,6 +274,11 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 			{
 				ucamPos.constantbuffer = i;
 				ucamPos.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uTime") == 0)
+			{
+				uTime.constantbuffer = i;
+				uTime.offset = variableDesc.StartOffset;
 			}
 		}
 

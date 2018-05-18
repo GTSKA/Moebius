@@ -228,6 +228,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				rasterizerDesc.DepthBias = 0;
 				rasterizerDesc.DepthBiasClamp = 0.0f;
 				rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+				
 				for (int i = 0; i < stateCount; ++i)
 				{
 					char state[50];
@@ -250,6 +251,9 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 						rasterizerDesc.MultisampleEnable = TRUE;
 					else if (strcmp(state, "MULTISAMPLE_DISABLED") == 0)
 						rasterizerDesc.MultisampleEnable = FALSE;
+					else if (strcmp(state, "GL_BLEND") == 0)
+						m_Shaders[i].InitBlendState(dev);
+					
 				}
 				if (!m_Shaders[i].InitRasterizerState(&rasterizerDesc, dev))
 				{

@@ -17,6 +17,7 @@ public:
 	void Draw(ID3D11DeviceContext* devcon);
 	void Update(float deltaTime, int pressedKey);
 	void Clean();
+	float GetTime();
 protected:
 	static SceneManager* m_pInstance;
 	int m_LightCount;
@@ -24,5 +25,6 @@ protected:
 	int m_ObjectCount;
 	Object* m_Objects;
 	Camera* m_camera;
+	float m_time;
 };
 

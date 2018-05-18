@@ -13,6 +13,7 @@ SceneManager::SceneManager()
 	m_camera = NULL;
 	m_Objects = NULL;
 	m_Lights = NULL;
+	m_time = 0;
 }
 SceneManager::SceneManager(const SceneManager &)
 {
@@ -135,7 +136,8 @@ bool SceneManager::Init(char* FileName)
 				fscanf_s(SMFile, "%*s %f, %f, %f", &rotation.x, &rotation.y, &rotation.z);
 				fscanf_s(SMFile, "%*s %f, %f, %f", &scale.x, &scale.y, &scale.z);
 
-				m_Objects[i].Init(id, modelId, &Textures2D, &cubicTextures, shaderId, &position, &rotation, &scale);///Init Object
+				if (!m_Objects[i].Init(id, modelId, &Textures2D, &cubicTextures, shaderId, &position, &rotation, &scale))///Init Object
+					return false;
 
 																													////free memory
 				if (Textures2D.m_textureIDs)
@@ -153,11 +155,13 @@ bool SceneManager::Init(char* FileName)
 			}
 		}
 	}
+	m_time = 0;
 	return true;
 }
 
 void SceneManager::Update(float deltaTime, int pressedKey)
 {
+	m_time += deltaTime;
 	if (pressedKey&(Globals::_KEY_A))
 	{
 		m_camera->moveLeft(deltaTime);
@@ -207,4 +211,8 @@ void SceneManager::Clean()
 		delete m_camera;
 		m_camera = NULL;
 	}
+}
+float SceneManager::GetTime()
+{
+	return m_time;
 }

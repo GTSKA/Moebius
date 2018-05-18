@@ -35,6 +35,7 @@ public:
 	void EnableStates(ID3D11DeviceContext* devcon);
 	void DisableStates(ID3D11DeviceContext* devcon);
 	bool InitRasterizerState(D3D11_RASTERIZER_DESC* rasterizerDesc, ID3D11Device* dev);
+	void InitBlendState(ID3D11Device* dev);
 protected:
 	unsigned int m_Id;
 	int LoadShader(unsigned int Type, char* filename, ID3DBlob** shaderBlob);
@@ -45,8 +46,9 @@ protected:
 	UINT numVSinput;
 	ID3D11ShaderReflection* VertexShaderReflector;
 	ID3D11ShaderReflection* PixelShaderReflector;
-	ID3D11Buffer** m_vertexConstantBuffer;
+	ID3D11BlendState* m_BlendState;
 	ID3D11RasterizerState* m_RasterizerState;
+	ID3D11Buffer** m_vertexConstantBuffer;
 	UINT m_numVConstBuffer;
 	ID3D11Buffer** m_pixelConstantBuffer;
 	UINT m_numPConstBuffer;
@@ -65,7 +67,7 @@ public:
 	ShaderConstVar ufogColor;
 	ShaderConstVar ucamPos;
 	ShaderConstVar uTilingFactor;
-
+	ShaderConstVar uTime;
 	UINT u2DTexturesCount;
 	UINT uCubeTexturesCount;
 };

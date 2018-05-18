@@ -1,5 +1,6 @@
 #include "Object.h"
 #include "ResourceManager.h"
+#include "SceneManager.h"
 #include "Texture.h"
 #include "Model.h"
 #include "Shaders.h"
@@ -170,6 +171,13 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 			char* dst = (char*)ms.pData;
 			dst += m_Shader->ufogRange.offset;
 			memcpy(dst, &fogRange, sizeof(float));                 // copy the data
+		}
+		if (m_Shader->uTime.constantbuffer == i)
+		{
+			float Time = SceneManager::GetInstance()->GetTime();
+			char* dst = (char*)ms.pData;
+			dst += m_Shader->uTime.offset;
+			memcpy(dst, &Time, sizeof(float));                 // copy the data
 		}
 		devcon->Unmap(PSConstBuffer, NULL);
 		
