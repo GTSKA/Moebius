@@ -3,6 +3,7 @@ SamplerState ss[4];
 cbuffer ConstantBuffer
 {
 	float uTime;
+	float uFireAmp;
 }
 struct PS_In
 {
@@ -13,7 +14,7 @@ struct PS_In
 float4 PShader(PS_In input) : SV_TARGET
 {
 	float2 disp = Texture[2].Sample(ss[2],float2(input.texcoord.x,input.texcoord.y+uTime)).xy;
-	float dMax = 0.125;
+	float dMax = uFireAmp;
 	float2 offset = float2((disp.x*2.0f-1.0f)*dMax,(disp.y*2.0f-1.0f)*dMax);
 	float2 newTexcoord = input.texcoord + offset;
 	float4 fireColor = Texture[0].Sample(ss[0],newTexcoord);

@@ -179,6 +179,13 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 			dst += m_Shader->uTime.offset;
 			memcpy(dst, &Time, sizeof(float));                 // copy the data
 		}
+		if (m_Shader->uFireAmp.constantbuffer == i)
+		{
+			float FireAmp = Globals::FireAmplitude;
+			char* dst = (char*)ms.pData;
+			dst += m_Shader->uFireAmp.offset;
+			memcpy(dst, &FireAmp, sizeof(float));                 // copy the data
+		}
 		devcon->Unmap(PSConstBuffer, NULL);
 		
 	}

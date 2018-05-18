@@ -68,6 +68,7 @@ public:
 	ShaderConstVar ucamPos;
 	ShaderConstVar uTilingFactor;
 	ShaderConstVar uTime;
+	ShaderConstVar uFireAmp;
 	UINT u2DTexturesCount;
 	UINT uCubeTexturesCount;
 };

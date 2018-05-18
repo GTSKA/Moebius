@@ -12,6 +12,7 @@ public:
 	static const int screenHeight = SCREEN_HEIGHT;
 	static const float SPEED_CAM;
 	static const float SPEED_CAM_ROT;
+	static const float FireAmplitude;
 	static const int maxTextureCount = 8;
 	static const int TilingFactor = 16;
 	static enum KEY

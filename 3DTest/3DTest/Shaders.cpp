@@ -20,6 +20,7 @@ Shaders::Shaders()
 	ufogColor.constantbuffer = -1;
 	ucamPos.constantbuffer = -1;
 	uTime.constantbuffer = -1;
+	uFireAmp.constantbuffer = -1;
 	u2DTexturesCount = 0;
 	uCubeTexturesCount = 0;
 	m_BlendState = NULL;
@@ -279,6 +280,11 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 			{
 				uTime.constantbuffer = i;
 				uTime.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uFireAmp") == 0)
+			{
+				uFireAmp.constantbuffer = i;
+				uFireAmp.offset = variableDesc.StartOffset;
 			}
 		}
 
