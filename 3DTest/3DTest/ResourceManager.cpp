@@ -144,6 +144,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				MODEL_ERROR result = m_Models[i].InitModel(modelName, id,dev,devcon);
 				if (result != MODEL_SUCCESS)
 				{
+					fclose(RMFile);
 					return false;
 				}
 			}
@@ -175,6 +176,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				}
 				if (!m_Textures[i].Init(textureName, id, dev, devcon))
 				{
+					fclose(RMFile);
 					return false;
 				}
 			}
@@ -193,6 +195,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				m_cubeTextures[i].setWrapMode(REPEAT);//always to avoid weird visual objects
 				if (!m_cubeTextures[i].InitCubeTexture(textureName, id,dev,devcon))
 				{
+					fclose(RMFile);
 					return false;
 				}
 			}
@@ -213,6 +216,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				FragmentSName[strlen(FragmentSName) - 1] = '\0';
 				if (m_Shaders[i].Init(VertexSName, FragmentSName, dev, Id) < 0)
 				{
+					fclose(RMFile);
 					return false;
 				}
 				int stateCount;
@@ -229,7 +233,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				rasterizerDesc.DepthBiasClamp = 0.0f;
 				rasterizerDesc.SlopeScaledDepthBias = 0.0f;
 				
-				for (int i = 0; i < stateCount; ++i)
+				for (int j = 0; j < stateCount; ++j)
 				{
 					char state[50];
 					fscanf_s(RMFile, "%s", state, _countof(state));
@@ -253,11 +257,11 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 						rasterizerDesc.MultisampleEnable = FALSE;
 					else if (strcmp(state, "GL_BLEND") == 0)
 						m_Shaders[i].InitBlendState(dev);
-					
 				}
 				if (!m_Shaders[i].InitRasterizerState(&rasterizerDesc, dev))
 				{
 					OutputDebugString("Error generatin Rasterizer State");
+					fclose(RMFile);
 					return false;
 				}
 			}
@@ -267,6 +271,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 			
 		}
 	}
+	fclose(RMFile);
 	return true;
 }
 

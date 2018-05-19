@@ -15,6 +15,7 @@ public:
 	static const float FireAmplitude;
 	static const int maxTextureCount = 8;
 	static const int TilingFactor = 16;
+	static const int maxLightCount = 10;
 	static enum KEY
 	{
 		KEY_A = 65,

@@ -7,10 +7,17 @@
 #include "Camera.h"
 #include "Vertex.h"
 #include "Globals.h"
+#include "Light.h"
 #include <d3d11.h>
 
 Object::Object()
 {
+	m_model = NULL;
+	m_Textures = NULL;
+	m_CubeTextures = NULL;
+	m_Lights = NULL;
+	m_tilingFactor = 0.0f;
+	m_LightCount = 0;
 }
 
 
@@ -88,23 +95,12 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 		if (m_Shader->uWVP.constantbuffer == i)
 		{
 			Matrix wMatrix = m_worldMatrix * cam->getViewMatrix()*cam->getProjectionMatrix();
-			char* dst = (char*)ms.pData;
-			dst += m_Shader->uWVP.offset;
-			memcpy(dst, &wMatrix.m[0][0], 16 * sizeof(float));                 // copy the data
+			UniformMatrix4f(ms.pData, m_Shader->uWVP.offset, &wMatrix);
 		}
 		if (m_Shader->uworldMatrix.constantbuffer == i)
-		{
-			char* dst = (char*)ms.pData;
-			dst += m_Shader->uworldMatrix.offset;
-			memcpy(dst, &m_worldMatrix.m[0][0], 16 * sizeof(float));                 // copy the data
-		}
+			UniformMatrix4f(ms.pData, m_Shader->uworldMatrix.offset, &m_worldMatrix);
 		if (m_Shader->uTilingFactor.constantbuffer == i)
-		{			
-			float tiling = (float)Globals::TilingFactor;
-			char* dst = (char*)ms.pData;
-			dst += m_Shader->uTilingFactor.offset;
-			memcpy(dst, &tiling, sizeof(float));                 // copy the data		
-		}
+			Uniform1f(ms.pData, m_Shader->uTilingFactor.offset, m_tilingFactor);
 		devcon->Unmap(VSConstBuffer, NULL);
 		
 		devcon->VSSetConstantBuffers(0, 1, &VSConstBuffer);
@@ -128,6 +124,16 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 		offset = 7*sizeof(float);
 		devcon->IASetVertexBuffers(m_Shader->normalAttribute, 1, &(m_model->m_vertexBuffer), &stride, &offset);
 	}
+	if (m_Shader->binormalAttribute != -1)
+	{
+		offset = 10 * sizeof(float);
+		devcon->IASetVertexBuffers(m_Shader->binormalAttribute, 1, &(m_model->m_vertexBuffer), &stride, &offset);
+	}
+	if (m_Shader->tangentAttribute != -1)
+	{
+		offset = 13 * sizeof(float);
+		devcon->IASetVertexBuffers(m_Shader->tangentAttribute, 1, &(m_model->m_vertexBuffer), &stride, &offset);
+	}
 	if (m_Shader->uvAttribute != -1)
 	{
 		offset = 16*sizeof(float);
@@ -143,48 +149,41 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 		D3D11_MAPPED_SUBRESOURCE ms;
 		devcon->Map(PSConstBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);    // map the buffer
 		if (m_Shader->ucamPos.constantbuffer == i)
-		{
-			char* dst = (char*)ms.pData;
-			dst+= m_Shader->ucamPos.offset;
-			float camPos[3];
-			camPos[0] = cam->getPosition().x;
-			camPos[1] = cam->getPosition().y;
-			camPos[2] = cam->getPosition().z;
-			memcpy(dst, camPos, 3 * sizeof(float));                 // copy the data
-		}
+			Uniform3fv(ms.pData, m_Shader->ucamPos.offset, cam->getPosition());
 		if (m_Shader->ufogColor.constantbuffer == i)
-		{
-			char* dst = (char*)ms.pData;
-			dst += m_Shader->ufogColor.offset;
-			memcpy(dst, &cam->getFogColor(), 3 * sizeof(float));                 // copy the data
-		}
+			Uniform3fv(ms.pData, m_Shader->ufogColor.offset, cam->getFogColor());
 		if (m_Shader->ufogStart.constantbuffer == i)
-		{
-			float fogStart = cam->getFogStart();
-			char* dst = (char*)ms.pData;
-			dst += m_Shader->ufogStart.offset;
-			memcpy(dst, &fogStart, sizeof(float));                 // copy the data	
-		}
+			Uniform1f(ms.pData, m_Shader->ufogStart.offset, cam->getFogStart());
 		if (m_Shader->ufogRange.constantbuffer == i)
-		{
-			float fogRange = cam->getFogRange();
-			char* dst = (char*)ms.pData;
-			dst += m_Shader->ufogRange.offset;
-			memcpy(dst, &fogRange, sizeof(float));                 // copy the data
-		}
+			Uniform1f(ms.pData, m_Shader->ufogRange.offset, cam->getFogRange());
 		if (m_Shader->uTime.constantbuffer == i)
-		{
-			float Time = SceneManager::GetInstance()->GetTime();
-			char* dst = (char*)ms.pData;
-			dst += m_Shader->uTime.offset;
-			memcpy(dst, &Time, sizeof(float));                 // copy the data
-		}
+			Uniform1f(ms.pData, m_Shader->uTime.offset, SceneManager::GetInstance()->GetTime());
 		if (m_Shader->uFireAmp.constantbuffer == i)
+			Uniform1f(ms.pData, m_Shader->uFireAmp.offset, Globals::FireAmplitude);
+		if (m_LightCount)
 		{
-			float FireAmp = Globals::FireAmplitude;
-			char* dst = (char*)ms.pData;
-			dst += m_Shader->uFireAmp.offset;
-			memcpy(dst, &FireAmp, sizeof(float));                 // copy the data
+			if (m_Shader->uNumLights.constantbuffer == i)
+				Uniform1i(ms.pData, m_Shader->uNumLights.offset, m_LightCount);
+			if (m_Shader->uAmbientColor.constantbuffer == i)
+				Uniform3fv(ms.pData, m_Shader->uAmbientColor.offset, SceneManager::GetInstance()->GetAmbientColor());
+			if (m_Shader->uAmbientWeight.constantbuffer == i)
+				Uniform1f(ms.pData, m_Shader->uAmbientWeight.offset, SceneManager::GetInstance()->GetAmbientWeight());
+			if (m_Shader->uSpecularPower.constantbuffer == i)
+				Uniform1f(ms.pData, m_Shader->uSpecularPower.offset, m_SpecularPower);
+			for (int j = 0; j < m_LightCount; ++j)
+			{
+				Light* light = NULL;
+				light = SceneManager::GetInstance()->GetLightById(m_Lights[j]);
+				if (light != NULL)
+				{
+					if (m_Shader->uLightTypes[j].constantbuffer == i)
+						Uniform1i(ms.pData, m_Shader->uLightTypes[j].offset, light->GetType());
+					if (m_Shader->uLightColors[j].constantbuffer == i)
+						Uniform3fv(ms.pData, m_Shader->uLightColors[j].offset, light->GetColor());
+					if(m_Shader->uPosDirs[j].constantbuffer == i)
+						Uniform3fv(ms.pData, m_Shader->uPosDirs[j].offset, light->GetPosDir());
+				}
+			}
 		}
 		devcon->Unmap(PSConstBuffer, NULL);
 		
@@ -228,6 +227,26 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 	devcon->DrawIndexed(m_model->getIndexSize(), 0, 0);
 	
 }
+
+void Object::InitLights(int LightCount, unsigned int* Lights, float specularPower)
+{
+	m_SpecularPower = specularPower;
+	m_LightCount = LightCount;
+	if (m_LightCount)
+	{
+		m_Lights = new unsigned int[m_LightCount];
+		for (int i = 0; i < m_LightCount; ++i)
+		{
+			m_Lights[i] = Lights[i];
+		}
+	}
+}
+
+void Object::InitTilingFactor(float TilingFactor)
+{
+	m_tilingFactor = TilingFactor;
+}
+
 void Object::Clean()
 {
 	if (m_CubeTextures)
@@ -239,6 +258,11 @@ void Object::Clean()
 	{
 		delete[] m_Textures;
 		m_Textures = NULL;
+	}
+	if (m_Lights)
+	{
+		delete[] m_Lights;
+		m_Lights = NULL;
 	}
 }
 

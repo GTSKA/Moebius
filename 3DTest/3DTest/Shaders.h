@@ -8,6 +8,12 @@ class ID3D11ShaderReflection;
 class ID3D11InputLayout;
 class ID3D11RasterizerState;
 class ID3D11DeviceContext;
+class D3D11_MAPPED_SUBRESOURCE;
+class Matrix;
+class Vector2;
+class Vector3;
+class Vector4;
+
 
 struct ShaderConstVar
 {
@@ -60,6 +66,8 @@ public:
 	UINT colorAttribute;
 	UINT uvAttribute;
 	UINT normalAttribute;
+	UINT binormalAttribute;
+	UINT tangentAttribute;
 	ShaderConstVar uWVP;
 	ShaderConstVar uworldMatrix;
 	ShaderConstVar ufogRange;
@@ -69,7 +77,31 @@ public:
 	ShaderConstVar uTilingFactor;
 	ShaderConstVar uTime;
 	ShaderConstVar uFireAmp;
+	ShaderConstVar uAmbientColor;
+	ShaderConstVar uAmbientWeight;
+	ShaderConstVar uSpecularPower;
+	ShaderConstVar uNumLights;
+	ShaderConstVar* uLightTypes;
+	ShaderConstVar* uPosDirs;
+	ShaderConstVar* uLightColors;
 	UINT u2DTexturesCount;
 	UINT uCubeTexturesCount;
 };
+
+void Uniform1f(void* pData, UINT offset, float value);
+void Uniform2f(void* pData, UINT offset, float value1, float value2);
+void Uniform3f(void* pData, UINT offset, float value1, float value2, float value3);
+void Uniform4f(void* pData, UINT offset, float value1, float value2, float value3, float value4);
+
+void Uniform2fv(void* pData, UINT offset, Vector2 value);
+void Uniform3fv(void* pData, UINT offset, Vector3 value);
+void Uniform4fv(void* pData, UINT offset, Vector4 value);
+
+void Uniform1i(void* pData, UINT offset, int value);
+void Uniform2i(void* pData, UINT offset, int value1, int value2);
+void Uniform3i(void* pData, UINT offset, int value1, int value2, int value3);
+void Uniform4i(void* pData, UINT offset, int value1, int value2, int value3, int value4);
+
+void UniformMatrix4f(void* pData, UINT offset, Matrix *m);
+
 

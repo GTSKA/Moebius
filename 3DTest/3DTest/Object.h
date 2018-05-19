@@ -21,6 +21,8 @@ public:
 	bool Init(unsigned int ID, unsigned modelID, TextureInit* textures2D, TextureInit* cubicTextures, unsigned int shaderID,
 		Vector3* position, Vector3* rotation, Vector3* scale);
 	void Clean();
+	void InitLights(int LightCount, unsigned int* Lights, float specularPower = 1.0f);
+	void InitTilingFactor(float TilingFactor);
 protected:
 	int m_TextureCount;
 	Texture** m_Textures;
@@ -34,6 +36,9 @@ protected:
 	Matrix m_worldMatrix;
 	unsigned int m_ID;
 	void CalcWorldMatrix();
-
+	int m_LightCount;
+	unsigned int* m_Lights;
+	float m_SpecularPower;
+	float m_tilingFactor;
 };
 

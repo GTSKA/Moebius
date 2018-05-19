@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <tchar.h>
 #include "Shaders.h"
+#include "MathUtil.h"
+#include "Globals.h"
 
 Shaders::Shaders()
 {
@@ -12,6 +14,8 @@ Shaders::Shaders()
 	colorAttribute = -1;
 	uvAttribute = -1;
 	normalAttribute = -1;
+	binormalAttribute = -1;
+	tangentAttribute = -1;
 	uWVP.constantbuffer = -1;
 	uworldMatrix.constantbuffer = -1;
 	uTilingFactor.constantbuffer = -1;
@@ -21,9 +25,16 @@ Shaders::Shaders()
 	ucamPos.constantbuffer = -1;
 	uTime.constantbuffer = -1;
 	uFireAmp.constantbuffer = -1;
+	uAmbientColor.constantbuffer = -1;
+	uAmbientWeight.constantbuffer = -1;
+	uSpecularPower.constantbuffer = -1;
+	uNumLights.constantbuffer = -1;
 	u2DTexturesCount = 0;
 	uCubeTexturesCount = 0;
 	m_BlendState = NULL;
+	uLightTypes = NULL;
+	uPosDirs = NULL;
+	uLightColors = NULL;
 }
 
 
@@ -41,7 +52,21 @@ Shaders::~Shaders()
 	for (int i = 0; i < m_numPConstBuffer; ++i)
 		m_pixelConstantBuffer[i]->Release();
 	delete[] m_pixelConstantBuffer;
-
+	if (uLightTypes)
+	{
+		delete[] uLightTypes;
+		uLightTypes = NULL;
+	}
+	if (uPosDirs)
+	{
+		delete[] uPosDirs;
+		uPosDirs = NULL;
+	}
+	if (uLightColors)
+	{
+		delete[] uLightColors;
+		uLightColors = NULL;
+	}
 	if (m_BlendState)
 		m_BlendState->Release();
 	m_RasterizerState->Release();
@@ -81,7 +106,9 @@ void Shaders::InitBlendState(ID3D11Device* dev)
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	blendDesc.IndependentBlendEnable = FALSE;
 	blendDesc.AlphaToCoverageEnable = FALSE;
-	dev->CreateBlendState(&blendDesc, &m_BlendState);
+	HRESULT hr = dev->CreateBlendState(&blendDesc, &m_BlendState);
+	if (FAILED(hr))
+		OutputDebugString("Falla al crear BlendState");
 }
 int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* dev)
 {
@@ -144,6 +171,15 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 		{
 			normalAttribute = i;
 		}
+		if (strcmp(resourceBindDesc.SemanticName, "BINORMAL") == 0)
+		{
+			binormalAttribute = i;
+		}
+		if (strcmp(resourceBindDesc.SemanticName, "TANGENT") == 0)
+		{
+			tangentAttribute = i;
+		}
+
 		
 		if (resourceBindDesc.Mask == 1)
 		{
@@ -286,6 +322,54 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 				uFireAmp.constantbuffer = i;
 				uFireAmp.offset = variableDesc.StartOffset;
 			}
+			if(strcmp(variableDesc.Name, "uAmbientColor") == 0)
+			{
+				uAmbientColor.constantbuffer = i;
+				uAmbientColor.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uAmbientWeight") == 0)
+			{
+				uAmbientWeight.constantbuffer = i;
+				uAmbientWeight.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uSpecularPower") == 0)
+			{
+				uSpecularPower.constantbuffer = i;
+				uSpecularPower.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uNumLights") == 0)
+			{
+				uNumLights.constantbuffer = i;
+				uNumLights.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uLightTypes") == 0)
+			{
+				uLightTypes = new ShaderConstVar[Globals::maxLightCount];
+				for (int j = 0; j < Globals::maxLightCount; ++j)
+				{
+					uLightTypes[j].constantbuffer = i;
+					uLightTypes[j].offset = variableDesc.StartOffset + j * sizeof(int);
+				}
+			}
+			if (strcmp(variableDesc.Name, "uPosDirs") == 0)
+			{
+				uPosDirs = new ShaderConstVar[Globals::maxLightCount];
+				for (int j = 0; j < Globals::maxLightCount; ++j)
+				{
+					uPosDirs[j].constantbuffer = i;
+					uPosDirs[j].offset = variableDesc.StartOffset + j * 3 * sizeof(float);
+				}
+			}
+			if (strcmp(variableDesc.Name, "uLightColors") == 0)
+			{
+				uLightColors = new ShaderConstVar[Globals::maxLightCount];
+				for (int j = 0; j < Globals::maxLightCount; ++j)
+				{
+					uLightColors[j].constantbuffer = i;
+					uLightColors[j].offset = variableDesc.StartOffset + j * 3 * sizeof(float);
+				}
+			}
+			
 		}
 
 	}
@@ -411,4 +495,89 @@ ID3D11VertexShader* Shaders::getVertexShader()
 ID3D11PixelShader* Shaders::getPixelShader() 
 {
 	return m_PixelShader;
+}
+
+
+/*//////////////////////////////////////////////////PASSING VALUES TO CONSTANT BUFFERS/////////////////////////////////////////////////////////////////////*/
+
+void Uniform1f(void* pData, UINT offset, float value)
+{
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, &value, sizeof(float));
+}
+void Uniform2f(void* pData, UINT offset, float value1, float value2)
+{
+	float val[2] = { value1 ,value2 };
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, val, 2*sizeof(float));
+}
+void Uniform3f(void* pData, UINT offset, float value1, float value2, float value3)
+{
+	float val[3] = { value1 ,value2, value3};
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, val, 3*sizeof(float));
+}
+void Uniform4f(void* pData, UINT offset, float value1, float value2, float value3, float value4)
+{
+	float val[4] = { value1 ,value2, value3, value4 };
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, val, 4*sizeof(float));
+}
+
+void Uniform1i(void* pData, UINT offset, int value)
+{
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, &value, sizeof(int));
+}
+void Uniform2i(void* pData, UINT offset, int value1, int value2)
+{
+	int val[2] = { value1 ,value2 };
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, val, 2 * sizeof(int));
+}
+void Uniform3i(void* pData, UINT offset, int value1, int value2, int value3)
+{
+	int val[3] = { value1 ,value2, value3 };
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, val, 3 * sizeof(int));
+}
+void Uniform4i(void* pData, UINT offset, int value1, int value2, int value3, int value4)
+{
+	int val[4] = { value1 ,value2, value3, value4 };
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, val, 4 * sizeof(int));
+}
+
+void UniformMatrix4f(void* pData, UINT offset, Matrix *m)
+{
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, &(m->m[0][0]), 16 * sizeof(float));
+}
+
+void Uniform2fv(void* pData, UINT offset, Vector2 value)
+{
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, &value, 2 * sizeof(int));
+}
+void Uniform3fv(void* pData, UINT offset, Vector3 value)
+{
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, &value, 3 * sizeof(int));
+}
+void Uniform4fv(void* pData, UINT offset, Vector4 value)
+{
+	char* dst = (char*)pData;
+	dst += offset;
+	memcpy(dst, &value, 4 * sizeof(int));
 }
