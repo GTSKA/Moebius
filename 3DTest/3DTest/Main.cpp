@@ -14,7 +14,7 @@
 #include "Shaders.h"
 #include "ResourceManager.h"
 #include "SceneManager.h"
-
+#include "EffectManager.h"
 using namespace std;
 
 
@@ -48,6 +48,7 @@ float angle;
 float g_DeltaTime;
 int keyPressed;
 Shaders myShaders;
+int activeEffect;
 //Camera cam;
 //Model woman;
 //Texture texture;
@@ -130,6 +131,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SceneManager::DestroyInstance();
 	ResourceManager::GetInstance()->Clean();
 	ResourceManager::DestroyInstance();
+	EffectManager::GetInstance()->Clean();
+	EffectManager::DestroyInstance();
 			   //return wParam from WM_QUIT message to Windows
 	MemoryDump();
 	return msg.wParam;
@@ -462,7 +465,7 @@ HRESULT Init(HWND *hWnd)
 	hr = dev->CreateDepthStencilView(pDepthStencil, &descDSV, &pDSV);
 	if (FAILED(hr))
 		return hr;
-	devcon->OMSetRenderTargets(1, &backbuffer, pDSV);
+	devcon->OMSetRenderTargets(1, &backbuffer, NULL);
 	//////////////////////////////////////////
 
 	//////////////////set the viewport
@@ -596,13 +599,19 @@ HRESULT InitGraphics()
 		OutputDebugString("Error while loading scene\n");
 		return S_FALSE;
 	}
+	bool effectManagerResult;
+	effectManagerResult = EffectManager::GetInstance()->Init("../Resources/EM.txt", dev, devcon);
+	if (!effectManagerResult)
+	{
+		OutputDebugString("Error while loading effects\n");
+		return S_FALSE;
+	}
 	return hr;
 }
 void Draw()
 {
-	float color[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
-	devcon->ClearRenderTargetView(backbuffer, color);
-	devcon->ClearDepthStencilView(pDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	EffectManager::GetInstance()->PreDraw(activeEffect);
+	
 
 	//Matrix scaleMatrix;
 	//Matrix rotationXMatrix;
@@ -688,7 +697,10 @@ void Draw()
 	//devcon->DrawIndexed(woman.getIndexSize(), 0, 0);
 
 	SceneManager::GetInstance()->Draw(devcon);
-
+	if (activeEffect)
+	{
+		EffectManager::GetInstance()->Draw(activeEffect - 1, devcon);
+	}
 	//switch the back buffer and front buffer
 	swapChain->Present(0, 0);
 }

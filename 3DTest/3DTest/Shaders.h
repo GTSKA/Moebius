@@ -91,6 +91,13 @@ public:
 	ShaderConstVar uDepthAdjustDisplacement;
 	ShaderConstVar uMaxReflection;
 
+	ShaderConstVar u_step;
+	ShaderConstVar u_limit;
+	ShaderConstVar u_near;
+	ShaderConstVar u_far;
+	ShaderConstVar u_fade;
+	ShaderConstVar u_clarity;
+
 	UINT u2DTexturesCount;
 	UINT samplers2DSlot;
 	UINT uCubeTexturesCount;

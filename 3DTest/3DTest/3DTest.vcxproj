@@ -115,7 +115,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="EffectManager.cpp" />
     <ClCompile Include="esUtil.cpp" />
+    <ClCompile Include="FrameBufferObject.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -126,6 +129,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Pass.cpp" />
+    <ClCompile Include="Quad.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Shaders.cpp" />
@@ -134,7 +139,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Effect.h" />
+    <ClInclude Include="EffectManager.h" />
     <ClInclude Include="esUtil.h" />
+    <ClInclude Include="FrameBufferObject.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="MathUtil.h" />
@@ -142,6 +150,8 @@
     <ClInclude Include="MemoryOperators.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Pass.h" />
+    <ClInclude Include="Quad.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Shaders.h" />

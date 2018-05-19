@@ -17,10 +17,13 @@ public:
 	static const int maxTextureCount = 8;
 	static const int TilingFactor = 16;
 	static const int maxLightCount = 10;
+	static const int maxOtherDataCount = 10;
+	static const int maxTextureIdetifierCount = 3;
 	static const float WaterDepthAdjustDisplacement;
 	static const Vector3 WaterColor;
 	static const float FresnelPower;
 	static const float WaterMaxReflection;
+
 	static enum KEY
 	{
 		KEY_A = 65,
