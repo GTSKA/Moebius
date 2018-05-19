@@ -260,7 +260,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 				}
 				if (!m_Shaders[i].InitRasterizerState(&rasterizerDesc, dev))
 				{
-					OutputDebugString("Error generatin Rasterizer State");
+					OutputDebugString("Error generating Rasterizer State");
 					fclose(RMFile);
 					return false;
 				}

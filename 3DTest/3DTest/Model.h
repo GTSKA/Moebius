@@ -20,6 +20,7 @@ public:
 	unsigned int getIndexSize();
 	unsigned int getVertexSize();
 	unsigned int getId();
+	float getMaxU();
 	ID3D11Buffer* m_vertexBuffer;
 	ID3D11Buffer* m_indexBuffer;
 protected:
@@ -27,5 +28,6 @@ protected:
 	unsigned int m_numVertex;
 	unsigned int m_numIndices;
 	unsigned int m_id;
+	float m_MaxU;
 };
 

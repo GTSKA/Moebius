@@ -1,5 +1,5 @@
 Texture2D Texture[2];
-SamplerState ss[2];
+SamplerState samplerDD[2];
 cbuffer ConstantBuffer
 {
 	float3 uAmbientColor;
@@ -26,7 +26,7 @@ float3 diffuseCI(float3 Normal, float3 lightDir, int i)
 	float3 diffColor = max(dot(Normal, -lightDir),0.0)*uLightColors[i];
 	return diffColor;
 }
-float3 specular(float3 lightDir, float3 normal, int i, float posW)
+float3 specular(float3 lightDir, float3 normal, int i, float3 posW)
 {
 	float3 reflectVector = normalize(reflect(lightDir,normal));
 	float3 toEye = normalize(ucamPos - posW);
@@ -35,7 +35,7 @@ float3 specular(float3 lightDir, float3 normal, int i, float posW)
 }
 float4 PShader(PS_In input) : SV_TARGET
 {
-	float3 Normal = Texture[1].Sample(ss[1],input.texcoord).xyz;
+	float3 Normal = Texture[1].Sample(samplerDD[1],input.texcoord).xyz;
 	float3x3 TBN=float3x3(normalize(input.tanW), normalize(input.bNormW), normalize(input.normalW)); 
 	float3 NormW = normalize(mul(TBN,2.0*Normal - 1.0));
 	
@@ -52,7 +52,7 @@ float4 PShader(PS_In input) : SV_TARGET
 		totalDiffuse += diffuseCI(NormW,LightDir[i],i);
 		totalSpecular += specular(LightDir[i],NormW,i,input.wPos);
 	}
-	float4 ObjColor = Texture[0].Sample(ss[0],input.texcoord);
+	float4 ObjColor = Texture[0].Sample(samplerDD[0],input.texcoord);
 	float4 ColorFinal = float4((uAmbientColor * uAmbientWeight + totalDiffuse *(1.0-uAmbientWeight))*ObjColor.xyz + totalSpecular, ObjColor.w);
 	return ColorFinal;
 	//return float4(NormW,1.0f);

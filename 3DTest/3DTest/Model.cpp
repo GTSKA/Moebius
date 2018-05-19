@@ -33,11 +33,13 @@ MODEL_ERROR Model::InitModel(char* filename, ID3D11Device* dev, ID3D11DeviceCont
 	fscanf_s(modelFile, "%*s %d", &m_numVertex);
 	VERTEX* modelVertex;
 	modelVertex = new VERTEX[m_numVertex];
+	m_MaxU = 0;
 	for (int i = 0; i < m_numVertex; ++i)
 	{
 		fscanf_s(modelFile, "   %*d. pos:[%f, %f, %f]; norm:[%f, %f, %f]; binorm:[%f, %f, %f]; tgt:[%f, %f, %f]; uv:[%f, %f];", &modelVertex[i].pos.x, &modelVertex[i].pos.y, &modelVertex[i].pos.z,
 			&modelVertex[i].normal.x, &modelVertex[i].normal.y, &modelVertex[i].normal.z, &modelVertex[i].binormal.x, &modelVertex[i].binormal.y, &modelVertex[i].binormal.z,
 			&modelVertex[i].tgt.x, &modelVertex[i].tgt.y, &modelVertex[i].tgt.z, &modelVertex[i].uvs.x, &modelVertex[i].uvs.y);
+		m_MaxU = (m_MaxU < modelVertex[i].uvs.x) ? modelVertex[i].uvs.x : m_MaxU;
 	}
 	if (ferror(modelFile))
 		return MODEL_VERTEX_ERROR;
@@ -111,4 +113,8 @@ unsigned int Model::getVertexSize()
 unsigned int Model::getId()
 {
 	return m_id;
+}
+float Model::getMaxU()
+{
+	return m_MaxU;
 }

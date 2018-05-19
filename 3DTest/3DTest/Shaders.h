@@ -84,8 +84,17 @@ public:
 	ShaderConstVar* uLightTypes;
 	ShaderConstVar* uPosDirs;
 	ShaderConstVar* uLightColors;
+
+	ShaderConstVar uWaterColor;
+	ShaderConstVar uFresnelPower;
+	ShaderConstVar uDepthAdjust;
+	ShaderConstVar uDepthAdjustDisplacement;
+	ShaderConstVar uMaxReflection;
+
 	UINT u2DTexturesCount;
+	UINT samplers2DSlot;
 	UINT uCubeTexturesCount;
+	UINT SamplersCubeSlot;
 };
 
 void Uniform1f(void* pData, UINT offset, float value);

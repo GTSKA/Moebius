@@ -1,6 +1,7 @@
 #pragma once
 //#define SPEED_CAM 1
 //#define SPEED_CAM_ROT 5
+#include "MathUtil.h"
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
 #define FPSLIMIT 60
@@ -16,6 +17,10 @@ public:
 	static const int maxTextureCount = 8;
 	static const int TilingFactor = 16;
 	static const int maxLightCount = 10;
+	static const float WaterDepthAdjustDisplacement;
+	static const Vector3 WaterColor;
+	static const float FresnelPower;
+	static const float WaterMaxReflection;
 	static enum KEY
 	{
 		KEY_A = 65,

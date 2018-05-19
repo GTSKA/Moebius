@@ -40,5 +40,6 @@ protected:
 	unsigned int* m_Lights;
 	float m_SpecularPower;
 	float m_tilingFactor;
+	float DepthAdjustment;
 };
 

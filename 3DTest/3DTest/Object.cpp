@@ -18,6 +18,7 @@ Object::Object()
 	m_Lights = NULL;
 	m_tilingFactor = 0.0f;
 	m_LightCount = 0;
+	DepthAdjustment = 0.1;
 }
 
 
@@ -160,6 +161,19 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 			Uniform1f(ms.pData, m_Shader->uTime.offset, SceneManager::GetInstance()->GetTime());
 		if (m_Shader->uFireAmp.constantbuffer == i)
 			Uniform1f(ms.pData, m_Shader->uFireAmp.offset, Globals::FireAmplitude);
+		if (m_Shader->uWaterColor.constantbuffer == i)
+			Uniform3f(ms.pData, m_Shader->uWaterColor.offset, Globals::WaterColor.x, Globals::WaterColor.y, Globals::WaterColor.z);
+		if (m_Shader->uFresnelPower.constantbuffer == i)
+			Uniform1f(ms.pData, m_Shader->uFresnelPower.offset, Globals::FresnelPower);
+		if (m_Shader->uDepthAdjust.constantbuffer == i)
+		{
+			float depthAdj = (m_model->getMaxU()) ? 1.0 / m_model->getMaxU() : 0.1;
+			Uniform1f(ms.pData, m_Shader->uDepthAdjust.offset, depthAdj);
+		}
+		if (m_Shader->uDepthAdjustDisplacement.constantbuffer == i)
+			Uniform1f(ms.pData, m_Shader->uDepthAdjustDisplacement.offset, Globals::WaterDepthAdjustDisplacement);
+		if (m_Shader->uMaxReflection.constantbuffer == i)
+			Uniform1f(ms.pData, m_Shader->uMaxReflection.offset, Globals::WaterMaxReflection);
 		if (m_LightCount)
 		{
 			if (m_Shader->uNumLights.constantbuffer == i)
@@ -200,8 +214,8 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 			samplers[textureUnit] = m_Textures[textureUnit]->getSampler();
 			textureUnit++;
 		}
-		devcon->PSSetSamplers(0, textureUnit, samplers);
-		devcon->PSSetShaderResources(0, textureUnit, textures);
+		devcon->PSSetSamplers(m_Shader->samplers2DSlot, textureUnit, samplers);
+		devcon->PSSetShaderResources(m_Shader->samplers2DSlot, textureUnit, textures);
 		delete[] textures;
 		delete[] samplers;
 	}
@@ -216,8 +230,8 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 			samplers[textureUnit] = m_CubeTextures[textureUnit]->getSampler();
 			textureUnit++;
 		}
-		devcon->PSSetSamplers(0, textureUnit, samplers);
-		devcon->PSSetShaderResources(0, textureUnit, cubeTextures);
+		devcon->PSSetSamplers(m_Shader->SamplersCubeSlot, textureUnit, samplers);
+		devcon->PSSetShaderResources(m_Shader->SamplersCubeSlot, textureUnit, cubeTextures);
 		delete[] cubeTextures;
 		delete[] samplers;
 	}

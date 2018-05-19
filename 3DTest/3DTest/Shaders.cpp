@@ -25,6 +25,12 @@ Shaders::Shaders()
 	ucamPos.constantbuffer = -1;
 	uTime.constantbuffer = -1;
 	uFireAmp.constantbuffer = -1;
+	uWaterColor.constantbuffer = -1;
+	uFresnelPower.constantbuffer = -1;
+	uDepthAdjust.constantbuffer = -1;
+	uDepthAdjustDisplacement.constantbuffer = -1;
+	uMaxReflection.constantbuffer = -1;
+
 	uAmbientColor.constantbuffer = -1;
 	uAmbientWeight.constantbuffer = -1;
 	uSpecularPower.constantbuffer = -1;
@@ -322,6 +328,33 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 				uFireAmp.constantbuffer = i;
 				uFireAmp.offset = variableDesc.StartOffset;
 			}
+
+			if (strcmp(variableDesc.Name, "uWaterColor") == 0)
+			{
+				uWaterColor.constantbuffer = i;
+				uWaterColor.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uFresnelPower") == 0)
+			{
+				uFresnelPower.constantbuffer = i;
+				uFresnelPower.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uDepthAdjust") == 0)
+			{
+				uDepthAdjust.constantbuffer = i;
+				uDepthAdjust.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uDepthAdjustDisplacement") == 0)
+			{
+				uDepthAdjustDisplacement.constantbuffer = i;
+				uDepthAdjustDisplacement.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uMaxReflection") == 0)
+			{
+				uMaxReflection.constantbuffer = i;
+				uMaxReflection.offset = variableDesc.StartOffset;
+			}
+
 			if(strcmp(variableDesc.Name, "uAmbientColor") == 0)
 			{
 				uAmbientColor.constantbuffer = i;
@@ -370,6 +403,7 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 				}
 			}
 			
+			
 		}
 
 	}
@@ -386,6 +420,14 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 		if(strcmp(resourceBindDesc.Name, "SkyMap") == 0)
 		{
 			uCubeTexturesCount = resourceBindDesc.BindCount;
+		}
+		if (strcmp(resourceBindDesc.Name, "samplerDD") == 0)
+		{
+			samplers2DSlot = resourceBindDesc.BindPoint;
+		}
+		if (strcmp(resourceBindDesc.Name, "samplerCube") == 0)
+		{
+			SamplersCubeSlot = resourceBindDesc.BindPoint;
 		}
 	}
 
