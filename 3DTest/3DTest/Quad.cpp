@@ -10,10 +10,16 @@ Quad::Quad()
 
 Quad::~Quad()
 {
-	m_indexBuffer->Release();
-	m_indexBuffer = NULL;
-	m_vertexBuffer->Release();
-	m_vertexBuffer = NULL;
+	if (m_indexBuffer)
+	{
+		m_indexBuffer->Release();
+		m_indexBuffer = NULL;
+	}
+	if (m_vertexBuffer)
+	{
+		m_vertexBuffer->Release();
+		m_vertexBuffer = NULL;
+	}
 }
 
 ID3D11Buffer* Quad::getIndexBuffer()

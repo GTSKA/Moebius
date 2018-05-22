@@ -184,6 +184,7 @@ bool EffectManager::Init(char* FileName, ID3D11Device* dev, ID3D11DeviceContext*
 				rasterizerDesc.DepthBiasClamp = 0.0f;
 				rasterizerDesc.SlopeScaledDepthBias = 0.0f;
 				rasterizerDesc.CullMode = D3D11_CULL_NONE;
+				m_Shaders[i].InitBlendState(dev);
 				m_Shaders[i].InitRasterizerState(&rasterizerDesc, dev);
 			}
 		}

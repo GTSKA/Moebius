@@ -2,7 +2,7 @@ Texture2D Texture[2];
 SamplerState samplerDD[2];
 cbuffer ConstantBuffer
 {
-	float4 uLimit;
+	float uLimit;
 }
 
 struct psIn

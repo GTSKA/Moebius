@@ -59,8 +59,6 @@ Shaders::Shaders()
 
 Shaders::~Shaders()
 {
-	delete[] m_vertexConstantBuffer;
-	delete[] m_pixelConstantBuffer;
 	if(VertexShaderReflector)
 		VertexShaderReflector->Release();
 	if(PixelShaderReflector)

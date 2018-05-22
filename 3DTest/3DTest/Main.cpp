@@ -192,8 +192,8 @@ HRESULT InitWindow(HWND *hWnd, HINSTANCE hInstance, int nCmdShow)
 						//"Lesson 3 window",//Window name (it will be displayed in the window's title bar)
 		"Our First Direct3D Program",//lesson 4 title
 		WS_OVERLAPPEDWINDOW, //dwStyle, we can define all kinds of options for the window
-		300,//X
-		300,//Y
+		0,//X
+		0,//Y
 		SCREEN_WIDTH,//wr.right - wr.left,//Width
 		SCREEN_HEIGHT,//wr.bottom - wr.top,//Height
 		NULL,//Parent, no parent window -> NULL
@@ -277,7 +277,19 @@ void Key(HWND* hwnd, unsigned char key, bool bIsPressed)
 		case Globals::KEY_S:
 			keyPressed += (keyPressed&(Globals::_KEY_S)) ? 0 : Globals::_KEY_S;
 			break;
-		case 37://left arrow key
+			case Globals::KEY_I:
+			keyPressed += (keyPressed&(Globals::_KEY_UP)) ? 0 : Globals::_KEY_UP; 
+			break;
+		case Globals::KEY_K://up arrow key
+			keyPressed += (keyPressed&(Globals::_KEY_DOWN)) ? 0 : Globals::_KEY_DOWN;
+			break;
+		case Globals::KEY_J://right arrow key
+			keyPressed += (keyPressed&(Globals::_KEY_LEFT)) ? 0 : Globals::_KEY_LEFT;
+			break;
+		case Globals::KEY_L://down arrow key
+			keyPressed += (keyPressed&(Globals::_KEY_RIGHT)) ? 0 : Globals::_KEY_RIGHT;
+			break;
+		/*case 37://left arrow key
 			keyPressed += (keyPressed&(Globals::_KEY_LEFT)) ? 0 : Globals::_KEY_LEFT;
 			break;
 		case 38://up arrow key
@@ -288,7 +300,7 @@ void Key(HWND* hwnd, unsigned char key, bool bIsPressed)
 			break;
 		case 40://down arrow key
 			keyPressed += (keyPressed&(Globals::_KEY_DOWN)) ? 0 : Globals::_KEY_DOWN;
-			break;
+			break;*/
 		case Globals::KEY_0:
 			activeEffect = 0;
 			break;
@@ -323,7 +335,19 @@ void Key(HWND* hwnd, unsigned char key, bool bIsPressed)
 		case Globals::KEY_S:
 			keyPressed -= (keyPressed&(Globals::_KEY_S)) ? Globals::_KEY_S : 0;
 			break;
-		case 37://left arrow key
+		case Globals::KEY_I:
+			keyPressed -= (keyPressed&(Globals::_KEY_UP)) ? Globals::_KEY_UP : 0;
+			break;
+		case Globals::KEY_K://up arrow key
+			keyPressed -= (keyPressed&(Globals::_KEY_DOWN)) ?  Globals::_KEY_DOWN : 0;
+			break;
+		case Globals::KEY_J://right arrow key
+			keyPressed -= (keyPressed&(Globals::_KEY_LEFT)) ? Globals::_KEY_LEFT : 0;
+			break;
+		case Globals::KEY_L://down arrow key
+			keyPressed -= (keyPressed&(Globals::_KEY_RIGHT)) ?Globals::_KEY_RIGHT : 0;
+			break;
+		/*case 37://left arrow key
 			keyPressed -= (keyPressed&(Globals::_KEY_LEFT)) ? Globals::_KEY_LEFT : 0;
 			break;
 		case 38://up arrow key
@@ -334,7 +358,7 @@ void Key(HWND* hwnd, unsigned char key, bool bIsPressed)
 			break;
 		case 40://down arrow key
 			keyPressed -= (keyPressed&(Globals::_KEY_DOWN)) ? Globals::_KEY_DOWN : 0;
-			break;
+			break;*/
 		}
 	}
 }
@@ -712,18 +736,31 @@ void CleanUp()
 {
 	swapChain->SetFullscreenState(FALSE, NULL);    // switch to windowed mode
 												   //close and release all existing COM objects
-	pVS->Release();
-	pPS->Release();
+	if(pVS)
+		pVS->Release();
+	if(pPS)
+		pPS->Release();
+	if(pCBuffer)
 	pCBuffer->Release();
-	pRS->Release();
-	pLayout->Release();
-	pVBuffer->Release();
-	pDSState->Release();
-	pDSV->Release();
-	pDepthStencil->Release();
-	swapChain->Release();
-	backbuffer->Release();
-	dev->Release();
-	devcon->Release();
+	if(pRS)
+		pRS->Release();
+	if(pLayout)
+		pLayout->Release();
+	if(pVBuffer)
+		pVBuffer->Release();
+	if(pDSState)
+		pDSState->Release();
+	if(pDSV)
+		pDSV->Release();
+	if(pDepthStencil)
+		pDepthStencil->Release();
+	if(swapChain)
+		swapChain->Release();
+	if(backbuffer)
+		backbuffer->Release();
+	if(dev)
+		dev->Release();
+	if(devcon)
+		devcon->Release();
 
 }
