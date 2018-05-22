@@ -289,7 +289,7 @@ void Key(HWND* hwnd, unsigned char key, bool bIsPressed)
 		case 40://down arrow key
 			keyPressed += (keyPressed&(Globals::_KEY_DOWN)) ? 0 : Globals::_KEY_DOWN;
 			break;
-		/*case Globals::KEY_0:
+		case Globals::KEY_0:
 			activeEffect = 0;
 			break;
 		case Globals::KEY_1:
@@ -303,7 +303,7 @@ void Key(HWND* hwnd, unsigned char key, bool bIsPressed)
 			break;
 		case Globals::KEY_4:
 			activeEffect = 4;
-			break;*/
+			break;
 
 		}
 	}
@@ -430,7 +430,7 @@ HRESULT Init(HWND *hWnd)
 	hr = dev->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
 	if (FAILED(hr))
 		return hr;
-	/*D3D11_DEPTH_STENCIL_DESC dsDesc;
+	D3D11_DEPTH_STENCIL_DESC dsDesc;
 
 	// Depth test parameters
 	dsDesc.DepthEnable = true;
@@ -457,7 +457,7 @@ HRESULT Init(HWND *hWnd)
 	hr = dev->CreateDepthStencilState(&dsDesc, &pDSState);
 	if (FAILED(hr))
 		return hr;
-	devcon->OMSetDepthStencilState(pDSState, 1);*/
+	devcon->OMSetDepthStencilState(pDSState, 1);
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
 	descDSV.Format = descDepth.Format;
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
@@ -606,11 +606,13 @@ HRESULT InitGraphics()
 		OutputDebugString("Error while loading effects\n");
 		return S_FALSE;
 	}
+	EffectManager::GetInstance()->setDefaultRenderTarget(backbuffer);
+	EffectManager::GetInstance()->setDefaultDepthStencil(pDSV);
 	return hr;
 }
 void Draw()
 {
-	EffectManager::GetInstance()->PreDraw(activeEffect);
+	EffectManager::GetInstance()->PreDraw(activeEffect,devcon);
 	
 
 	//Matrix scaleMatrix;

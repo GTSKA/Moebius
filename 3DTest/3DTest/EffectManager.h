@@ -6,6 +6,7 @@ class Quad;
 class ID3D11Device;
 class ID3D11DeviceContext;
 class ID3D11RenderTargetView;
+class ID3D11DepthStencilView;
 class EffectManager
 {
 protected:
@@ -24,11 +25,13 @@ public:
 	void DeleteShaders();
 	int Get_EffectCount();
 	void setDefaultRenderTarget(ID3D11RenderTargetView* renderTarget);
+	void setDefaultDepthStencil(ID3D11DepthStencilView* depthStencil);
 	FramebufferObject* GetFBO(int index);
 	Effect* GetEffects();
 	Quad* GetQuads();
 	Shaders* GetShader(unsigned int ShaderId);
-	ID3D11RenderTargetView* getBackBuffer();
+	ID3D11RenderTargetView* getDefaultBuffer();
+	ID3D11DepthStencilView* getDefaultStencil();
 protected:
 	static EffectManager* m_pInstance;
 
@@ -47,6 +50,7 @@ protected:
 	unsigned int m_numIndices;*/
 
 	Quad* m_Quads;
-	ID3D11RenderTargetView *backbuffer;	//pointer to the back buffer
+	ID3D11RenderTargetView* m_defaultBuffer;	//pointer to the back buffer
+	ID3D11DepthStencilView* m_defaultStencil;
 };
 

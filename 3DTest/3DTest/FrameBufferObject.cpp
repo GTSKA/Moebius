@@ -1,15 +1,23 @@
 #include "FrameBufferObject.h"
 #include "Quad.h"
 #include "Globals.h"
-#include <D3D11.h>
+#include <d3d11.h>
 
 
-FrameBufferObject::FrameBufferObject()
+FramebufferObject::FramebufferObject()
 {
+	m_ShaderColorResView = NULL;
+	m_ShaderDepthResView = NULL;
+	m_DepthTexture = NULL;
+	m_DepthStencilView = NULL;
+	m_ColorRenderTargetView = NULL;
+	m_ColorTexture = NULL;
+	m_ColorSampler = NULL;
+	m_DepthSampler = NULL;
 }
 
 
-FrameBufferObject::~FrameBufferObject()
+FramebufferObject::~FramebufferObject()
 {
 	//m_DepthTexture->Release();
 	//m_Framebuffer->Release();
@@ -17,12 +25,27 @@ FrameBufferObject::~FrameBufferObject()
 	//m_ColorTexture->;
 	//m_ColorRenderTargetView;
 	//m_colorShaderResView;
-	if (m_ShaderResView)
+	if (m_ShaderColorResView)
 	{
-		m_ShaderResView->Release();
-		m_colorShaderResView = 0;
+		m_ShaderColorResView->Release();
+		m_ShaderColorResView = 0;
 	}
-
+	if (m_ShaderDepthResView)
+	{
+		m_ShaderDepthResView->Release();
+		m_ShaderDepthResView = 0;
+	}
+	
+	if (m_DepthTexture)
+	{
+		m_DepthTexture->Release();
+		m_DepthTexture = 0;
+	}
+	if (m_DepthStencilView)
+	{
+		m_DepthStencilView->Release();
+		m_DepthStencilView = 0;
+	}
 	if (m_ColorRenderTargetView)
 	{
 		m_ColorRenderTargetView->Release();
@@ -33,6 +56,17 @@ FrameBufferObject::~FrameBufferObject()
 	{
 		m_ColorTexture->Release();
 		m_ColorTexture = 0;
+	}
+
+	if (m_ColorSampler)
+	{
+		m_ColorSampler->Release();
+		m_ColorSampler = 0;
+	}
+	if (m_DepthSampler)
+	{
+		m_DepthSampler->Release();
+		m_DepthSampler = 0;
 	}
 }
 
@@ -47,27 +81,30 @@ FBOERROR FramebufferObject::Init(ID3D11Device* dev, UINT textureWidth, UINT text
 	textureDesc.Width = textureWidth;
 	textureDesc.Height = textureHeight;
 	textureDesc.MipLevels = 1;
-	textureDesc.ArraySize = 1;
-	if(isDepth)
-		textureDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-	else
-		textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	textureDesc.ArraySize = 1;		
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	if(isDepth)
-		textureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-	else
-		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = 0;
-
 	if (isDepth)
+	{
+		textureDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+		textureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 		result = dev->CreateTexture2D(&textureDesc, NULL, &m_DepthTexture);
-	else
+		if (FAILED(result))
+			return FBO_DEPTHTEX_ERROR;
+	}
+	
+	{
+		textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		result = dev->CreateTexture2D(&textureDesc, NULL, &m_ColorTexture);
-	if (FAILED(result))
-		return (isDepth)? FBO_DEPTHTEX_ERROR:FBO_COLORTEX_ERROR;
+		if (FAILED(result))
+			return FBO_COLORTEX_ERROR;
+	}
+		
+	
 	if (isDepth)
 	{
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
@@ -78,8 +115,12 @@ FBOERROR FramebufferObject::Init(ID3D11Device* dev, UINT textureWidth, UINT text
 		result = dev->CreateDepthStencilView(m_DepthTexture, &depthStencilViewDesc, &m_DepthStencilView);
 		if (FAILED(result))
 			return FBO_INCOMPLETE;
+		if (!CreateTexture(dev, isDepth))
+		{
+			return FBO_DEPTHTEX_ERROR;
+		}
 	}
-	else
+	
 	{
 		// Setup the description of the render target view.
 		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
@@ -89,30 +130,87 @@ FBOERROR FramebufferObject::Init(ID3D11Device* dev, UINT textureWidth, UINT text
 		result = dev->CreateRenderTargetView(m_ColorTexture, &renderTargetViewDesc, &m_ColorRenderTargetView);
 		if (FAILED(result))
 			return FBO_INCOMPLETE;
+		if (!CreateTexture(dev))
+		{
+			return FBO_COLORTEX_ERROR;
+		}
 	}
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-	// Setup the description of the shader resource view.
-	if (isDepth)
-		shaderResourceViewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-	else
-		shaderResourceViewDesc.Format = textureDesc.Format;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-	
+
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+	// Setup the description of the shader resource view.
 	if (isDepth)
-		result = dev->CreateShaderResourceView(m_DepthTexture, &shaderResourceViewDesc, &m_ShaderResView);
-	else
-		result = dev->CreateShaderResourceView(m_ColorTexture, &shaderResourceViewDesc, &m_ShaderResView);
+	{
+		shaderResourceViewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		result = dev->CreateShaderResourceView(m_DepthTexture, &shaderResourceViewDesc, &m_ShaderDepthResView);
+		if (FAILED(result))
+			return FBO_INCOMPLETE;
+	}
+		
+	{
+		shaderResourceViewDesc.Format = textureDesc.Format;
+		result = dev->CreateShaderResourceView(m_ColorTexture, &shaderResourceViewDesc, &m_ShaderColorResView);
+		if (FAILED(result))
+			return FBO_INCOMPLETE;
+	}
+	
+	
+	
+		
 
 	return FBO_SUCCESS;
 }
-ID3D11RenderTargetView* FramebufferObject::GetColorTexture()
+bool FramebufferObject::CreateTexture(ID3D11Device* dev, bool isDepth)
+{
+	D3D11_SAMPLER_DESC samplerDesc;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	samplerDesc.MaxAnisotropy = 8;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.MinLOD = 0.0f;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	samplerDesc.MipLODBias = 2.0f;
+	HRESULT hr;
+	if(isDepth)
+		hr = dev->CreateSamplerState(&samplerDesc, &m_DepthSampler);
+	else
+		hr = dev->CreateSamplerState(&samplerDesc, &m_ColorSampler);
+	if (FAILED(hr))
+		return false;
+	return true;
+}
+ID3D11ShaderResourceView* FramebufferObject::GetColorTexture()
+{
+	return m_ShaderColorResView;
+}
+ID3D11ShaderResourceView* FramebufferObject::GetDepthTexture()
+{
+	return m_ShaderDepthResView;
+}
+ID3D11SamplerState* FramebufferObject::GetColorSampler()
+{
+	return m_ColorSampler;
+}
+ID3D11SamplerState* FramebufferObject::GetDepthSampler()
+{
+	return m_DepthSampler;
+}
+ID3D11RenderTargetView* FramebufferObject::GetRenderTarget()
 {
 	return m_ColorRenderTargetView;
 }
-ID3D11DepthStencilView* FramebufferObject::GetDepthTexture()
+ID3D11DepthStencilView* FramebufferObject::GetDepthStencil()
 {
 	return m_DepthStencilView;
 }

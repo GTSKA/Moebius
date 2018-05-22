@@ -1,7 +1,7 @@
 #include "Effect.h"
 #include "Pass.h"
 #include <tchar.h>
-
+#include <d3d11.h>
 
 Effect::Effect()
 {
@@ -55,7 +55,7 @@ bool Effect::Init(unsigned int Id, const char* Name, int passCount)
 	{
 		return false;
 	}
-	strcpy(m_Name, Name);
+	strcpy_s(m_Name, Name);
 	m_passCount = passCount;
 	m_passes = new Pass[passCount];
 	return true;

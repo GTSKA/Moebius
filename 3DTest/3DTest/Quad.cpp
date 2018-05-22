@@ -10,15 +10,15 @@ Quad::Quad()
 
 Quad::~Quad()
 {
-	m_IndexBuffer->Release();
-	m_IndexBuffer = NULL;
+	m_indexBuffer->Release();
+	m_indexBuffer = NULL;
 	m_vertexBuffer->Release();
 	m_vertexBuffer = NULL;
 }
 
 ID3D11Buffer* Quad::getIndexBuffer()
 {
-	return m_IndexBuffer;
+	return m_indexBuffer;
 }
 ID3D11Buffer* Quad::getVertexBuffer()
 {
@@ -28,13 +28,13 @@ void Quad::Init(ID3D11Device* dev, ID3D11DeviceContext* devcon)
 {
 	VERTEX quad_vertices[4];
 	quad_vertices[0].pos.x = -1.0; quad_vertices[0].pos.y = 1.0; quad_vertices[0].pos.z = 0.0;
-	quad_vertices[0].uvs.x = 0.0; quad_vertices[0].uvs.y = 1.0;
+	quad_vertices[0].uvs.x = 0.0; quad_vertices[0].uvs.y = 0.0;
 	quad_vertices[1].pos.x = -1.0; quad_vertices[1].pos.y = -1.0; quad_vertices[1].pos.z = 0.0;
-	quad_vertices[1].uvs.x = 0.0; quad_vertices[1].uvs.y = 0.0;
+	quad_vertices[1].uvs.x = 0.0; quad_vertices[1].uvs.y = 1.0;
 	quad_vertices[2].pos.x = 1.0; quad_vertices[2].pos.y = -1.0; quad_vertices[2].pos.z = 0.0;
-	quad_vertices[2].uvs.x = 1.0; quad_vertices[2].uvs.y = 0.0;
+	quad_vertices[2].uvs.x = 1.0; quad_vertices[2].uvs.y = 1.0;
 	quad_vertices[3].pos.x = 1.0; quad_vertices[3].pos.y = 1.0; quad_vertices[3].pos.z = 0.0;
-	quad_vertices[3].uvs.x = 1.0; quad_vertices[3].uvs.y = 1.0;
+	quad_vertices[3].uvs.x = 1.0; quad_vertices[3].uvs.y = 0.0;
 
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));

@@ -31,6 +31,13 @@ Shaders::Shaders()
 	uDepthAdjustDisplacement.constantbuffer = -1;
 	uMaxReflection.constantbuffer = -1;
 
+	uStep.constantbuffer = -1;
+	uLimit.constantbuffer = -1;
+	uNear.constantbuffer = -1;
+	uFar.constantbuffer = -1;
+	uFade.constantbuffer = -1;
+	uClarity.constantbuffer = -1;
+
 	uAmbientColor.constantbuffer = -1;
 	uAmbientWeight.constantbuffer = -1;
 	uSpecularPower.constantbuffer = -1;
@@ -41,6 +48,12 @@ Shaders::Shaders()
 	uLightTypes = NULL;
 	uPosDirs = NULL;
 	uLightColors = NULL;
+	VertexShaderReflector = NULL;
+	PixelShaderReflector = NULL;
+	m_VertexShader = NULL;
+	m_PixelShader = NULL;
+	m_RasterizerState = NULL;
+	pLayout = NULL;
 }
 
 
@@ -48,10 +61,14 @@ Shaders::~Shaders()
 {
 	delete[] m_vertexConstantBuffer;
 	delete[] m_pixelConstantBuffer;
-	VertexShaderReflector->Release();
-	PixelShaderReflector->Release();
-	m_VertexShader->Release();
-	m_PixelShader->Release();
+	if(VertexShaderReflector)
+		VertexShaderReflector->Release();
+	if(PixelShaderReflector)
+		PixelShaderReflector->Release();
+	if(m_VertexShader)
+		m_VertexShader->Release();
+	if(m_PixelShader)
+		m_PixelShader->Release();
 	for (int i = 0; i < m_numVConstBuffer; ++i)
 		m_vertexConstantBuffer[i]->Release();
 	delete[] m_vertexConstantBuffer;
@@ -75,8 +92,10 @@ Shaders::~Shaders()
 	}
 	if (m_BlendState)
 		m_BlendState->Release();
-	m_RasterizerState->Release();
-	pLayout->Release();
+	if(m_RasterizerState)
+		m_RasterizerState->Release();
+	if(pLayout)
+		pLayout->Release();
 }
 void Shaders::Clean()
 {
@@ -402,7 +421,36 @@ int Shaders::Init(char* fileVertexShader, char* filePixelShader, ID3D11Device* d
 					uLightColors[j].offset = variableDesc.StartOffset + j * 3 * sizeof(float);
 				}
 			}
-			
+			if (strcmp(variableDesc.Name, "uStep") == 0)
+			{
+				uStep.constantbuffer = i;
+				uStep.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uLimit") == 0)
+			{
+				uLimit.constantbuffer = i;
+				uLimit.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uNear") == 0)
+			{
+				uNear.constantbuffer = i;
+				uNear.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uFar") == 0)
+			{
+				uFar.constantbuffer = i;
+				uFar.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uFade") == 0)
+			{
+				uFade.constantbuffer = i;
+				uFade.offset = variableDesc.StartOffset;
+			}
+			if (strcmp(variableDesc.Name, "uClarity") == 0)
+			{
+				uClarity.constantbuffer = i;
+				uClarity.offset = variableDesc.StartOffset;
+			}
 			
 		}
 

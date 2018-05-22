@@ -1,4 +1,6 @@
 #pragma once
+class ID3D11DeviceContext;
+
 static enum TEXTURE_TYPE
 {
 	TEXTURE_NOTUSED = 0,

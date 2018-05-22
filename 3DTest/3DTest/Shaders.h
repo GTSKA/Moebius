@@ -9,11 +9,20 @@ class ID3D11InputLayout;
 class ID3D11RasterizerState;
 class ID3D11DeviceContext;
 class D3D11_MAPPED_SUBRESOURCE;
+class D3D11_RASTERIZER_DESC;
+class ID3D11BlendState;
+#ifndef ID3DBlob
+class ID3D10Blob;
+typedef ID3D10Blob ID3DBlob;
+#endif // !ID3DBlob
 class Matrix;
 class Vector2;
 class Vector3;
 class Vector4;
 
+#ifndef UINT
+typedef unsigned int UINT;
+#endif
 
 struct ShaderConstVar
 {
@@ -91,12 +100,12 @@ public:
 	ShaderConstVar uDepthAdjustDisplacement;
 	ShaderConstVar uMaxReflection;
 
-	ShaderConstVar u_step;
-	ShaderConstVar u_limit;
-	ShaderConstVar u_near;
-	ShaderConstVar u_far;
-	ShaderConstVar u_fade;
-	ShaderConstVar u_clarity;
+	ShaderConstVar uStep;
+	ShaderConstVar uLimit;
+	ShaderConstVar uNear;
+	ShaderConstVar uFar;
+	ShaderConstVar uFade;
+	ShaderConstVar uClarity;
 
 	UINT u2DTexturesCount;
 	UINT samplers2DSlot;

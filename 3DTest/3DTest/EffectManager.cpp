@@ -119,19 +119,20 @@ void EffectManager::PreDraw(bool activate, ID3D11DeviceContext* devcon)
 	if (!activate)
 	{
 		
-		devcon->OMSetRenderTargets(1, &backbuffer, NULL);
+		devcon->OMSetRenderTargets(1, &m_defaultBuffer, m_defaultStencil);
 		float color[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
-		devcon->ClearRenderTargetView(backbuffer, color);
+		devcon->ClearRenderTargetView(m_defaultBuffer, color);
+		devcon->ClearDepthStencilView(m_defaultStencil, D3D11_CLEAR_DEPTH, 1.0f, 0);
 		
 		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 	else
 	{
-		ID3D11RenderTargetView* currentTargetView = m_FBOs[0].GetColorTexture();
-		devcon->OMSetRenderTargets(1, &currentTargetView, m_FBOs[0].GetDepthTexture());
+		ID3D11RenderTargetView* currentTargetView = m_FBOs[0].GetRenderTarget();
+		devcon->OMSetRenderTargets(1, &currentTargetView, m_FBOs[0].GetDepthStencil());
 		float color[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
-		devcon->ClearRenderTargetView(m_FBOs[0].GetColorTexture(), color);
-		devcon->ClearDepthStencilView(m_FBOs[0].GetDepthTexture(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		devcon->ClearRenderTargetView(m_FBOs[0].GetRenderTarget(), color);
+		devcon->ClearDepthStencilView(m_FBOs[0].GetDepthStencil(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 		//glBindFramebuffer(GL_FRAMEBUFFER, m_FBOs[0].GetFrameBuffer());
 	}
 }
@@ -164,14 +165,26 @@ bool EffectManager::Init(char* FileName, ID3D11Device* dev, ID3D11DeviceContext*
 				fscanf_s(EMFile, "%*s %u", &Id);
 				fscanf_s(EMFile, "%*s \"%s\"", VertexSName, _countof(VertexSName));
 				VertexSName[strlen(VertexSName) - 1] = '\0';
-				fscanf_s(EMFile, "%*s \"%s\"", FragmentSName);
+				fscanf_s(EMFile, "%*s \"%s\"", FragmentSName,_countof(FragmentSName));
 				FragmentSName[strlen(FragmentSName) - 1] = '\0';
 
-				if (m_Shaders[i].Init(VertexSName, FragmentSName, dev, devcon, Id) < 0)
+				if (m_Shaders[i].Init(VertexSName, FragmentSName, dev, Id) < 0)
 				{
 					//return false;
 					esLogMessage("Can't use shader %d\n", i);
 				}
+				D3D11_RASTERIZER_DESC rasterizerDesc;
+				rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+				rasterizerDesc.FrontCounterClockwise = FALSE;
+				rasterizerDesc.DepthClipEnable = TRUE;
+				rasterizerDesc.ScissorEnable = FALSE;
+				rasterizerDesc.AntialiasedLineEnable = FALSE;
+				rasterizerDesc.MultisampleEnable = FALSE;
+				rasterizerDesc.DepthBias = 0;
+				rasterizerDesc.DepthBiasClamp = 0.0f;
+				rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+				rasterizerDesc.CullMode = D3D11_CULL_NONE;
+				m_Shaders[i].InitRasterizerState(&rasterizerDesc, dev);
 			}
 		}
 		if (strcmp(remark, "#FBO") == 0)
@@ -315,9 +328,17 @@ bool EffectManager::Init(char* FileName, ID3D11Device* dev, ID3D11DeviceContext*
 }
 void EffectManager::setDefaultRenderTarget(ID3D11RenderTargetView* renderTarget)
 {
-	backbuffer = renderTarget;
+	m_defaultBuffer = renderTarget;
 }
-ID3D11RenderTargetView* EffectManager::getBackBuffer()
+void EffectManager::setDefaultDepthStencil(ID3D11DepthStencilView* depthStencil)
 {
-	return backbuffer;
+	m_defaultStencil = depthStencil;
+}
+ID3D11RenderTargetView* EffectManager::getDefaultBuffer()
+{
+	return m_defaultBuffer;
+}
+ID3D11DepthStencilView* EffectManager::getDefaultStencil()
+{
+	return m_defaultStencil;
 }
