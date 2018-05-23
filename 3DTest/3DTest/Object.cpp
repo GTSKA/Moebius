@@ -202,11 +202,14 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 		devcon->Unmap(PSConstBuffer, NULL);
 		
 	}
-	
+	ID3D11ShaderResourceView **textures = NULL; 
+	ID3D11SamplerState **samplers = NULL;
+	ID3D11ShaderResourceView** cubeTextures = NULL;
+	ID3D11SamplerState** cubesamplers = NULL;
 	if(m_Shader->u2DTexturesCount > 0)
 	{
-		ID3D11ShaderResourceView **textures = new ID3D11ShaderResourceView*[m_Shader->u2DTexturesCount];
-		ID3D11SamplerState **samplers = new ID3D11SamplerState*[m_Shader->u2DTexturesCount];
+		textures = new ID3D11ShaderResourceView*[m_Shader->u2DTexturesCount];
+		samplers = new ID3D11SamplerState*[m_Shader->u2DTexturesCount];
 		UINT textureUnit = 0;
 		while (textureUnit < m_Shader->u2DTexturesCount)
 		{
@@ -216,29 +219,52 @@ void Object::Draw(Camera* cam, ID3D11DeviceContext* devcon)
 		}
 		devcon->PSSetSamplers(m_Shader->samplers2DSlot, textureUnit, samplers);
 		devcon->PSSetShaderResources(m_Shader->samplers2DSlot, textureUnit, textures);
-		delete[] textures;
-		delete[] samplers;
+
+		
 	}
 	if (m_Shader->uCubeTexturesCount > 0)
 	{
-		ID3D11ShaderResourceView** cubeTextures = new ID3D11ShaderResourceView*[m_Shader->uCubeTexturesCount];
-		ID3D11SamplerState** samplers = new ID3D11SamplerState*[m_Shader->uCubeTexturesCount];
+		cubeTextures = new ID3D11ShaderResourceView*[m_Shader->uCubeTexturesCount];
+		cubesamplers = new ID3D11SamplerState*[m_Shader->uCubeTexturesCount];
 		UINT textureUnit = 0;
 		while (textureUnit < m_Shader->uCubeTexturesCount)
 		{
 			cubeTextures[textureUnit] = m_CubeTextures[textureUnit]->getTexture();
-			samplers[textureUnit] = m_CubeTextures[textureUnit]->getSampler();
+			cubesamplers[textureUnit] = m_CubeTextures[textureUnit]->getSampler();
 			textureUnit++;
 		}
-		devcon->PSSetSamplers(m_Shader->SamplersCubeSlot, textureUnit, samplers);
+		devcon->PSSetSamplers(m_Shader->SamplersCubeSlot, textureUnit, cubesamplers);
 		devcon->PSSetShaderResources(m_Shader->SamplersCubeSlot, textureUnit, cubeTextures);
-		delete[] cubeTextures;
-		delete[] samplers;
+		
 	}
 
 	devcon->IASetIndexBuffer(m_model->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 	devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	devcon->DrawIndexed(m_model->getIndexSize(), 0, 0);
+
+	if (m_Shader->u2DTexturesCount > 0)
+	{
+		for (int i = 0; i < m_Shader->u2DTexturesCount; ++i)
+		{
+			textures[i] = nullptr;
+		}
+		devcon->PSSetShaderResources(m_Shader->samplers2DSlot, m_Shader->u2DTexturesCount, textures);
+		delete[] textures;
+		delete[] samplers;
+	}
+	if (m_Shader->uCubeTexturesCount > 0)
+	{
+		for (int i = 0; i < m_Shader->uCubeTexturesCount; ++i)
+		{
+			cubeTextures[i] = nullptr;
+		}
+		devcon->PSSetShaderResources(m_Shader->SamplersCubeSlot, m_Shader->uCubeTexturesCount, cubeTextures);
+		delete[] cubeTextures;
+		delete[] cubesamplers;
+	}
+
+	
+	
 	
 }
 

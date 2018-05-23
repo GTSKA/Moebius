@@ -1,5 +1,6 @@
 #include "ResourceManager.h"
 #include "Model.h"
+#include "Plane.h"
 #include "Texture.h"
 #include "Shaders.h"
 #include <stdio.h>
@@ -137,15 +138,32 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 			for (int i = 0; i < m_modelCount; ++i)
 			{
 				int id;
-				char modelName[255];
+				char modeltype[50];
+
+				
 				fscanf_s(RMFile, "%*s %d", &id);
-				fscanf_s(RMFile, "%*s \"%s\"", modelName, _countof(modelName));
-				modelName[strlen(modelName) - 1] = '\0';
-				MODEL_ERROR result = m_Models[i].InitModel(modelName, id,dev,devcon);
-				if (result != MODEL_SUCCESS)
+				fscanf_s(RMFile, "%s", modeltype, _countof(modeltype));
+				
+				
+				if (strcmp(modeltype, "PLANE") == 0)
 				{
-					fclose(RMFile);
-					return false;
+					int w, h;
+					Plane plane;
+					fscanf_s(RMFile, " %d %d", &w, &h);
+					plane.Init(w, h, dev, devcon, id);
+					m_Models[i] = plane;
+				}
+				else if(strcmp(modeltype, "FILE") == 0)
+				{
+					char modelName[255];
+					fscanf_s(RMFile, " \"%s\"", modelName, _countof(modelName));
+					modelName[strlen(modelName) - 1] = '\0';
+					MODEL_ERROR result = m_Models[i].InitModel(modelName, id, dev, devcon);
+					if (result != MODEL_SUCCESS)
+					{
+						fclose(RMFile);
+						return false;
+					}
 				}
 			}
 		}

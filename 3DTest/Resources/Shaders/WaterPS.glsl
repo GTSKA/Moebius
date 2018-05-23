@@ -30,7 +30,7 @@ float fresnelTerm(float3 Normal, float3 toEye)
 }
 float3 diffuseCI(float3 Normal, float3 lightDir, int i)
 {
-	float3 diffColor = max(dot(Normal, -lightDir),0.0)*uLightColors[i];
+	float3 diffColor = max(dot(Normal, lightDir),0.0)*uLightColors[i];
 	return diffColor;
 }
 float3 specular(float3 lightDir, float3 normal, int i, float3 toEye)

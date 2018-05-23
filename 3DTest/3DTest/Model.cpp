@@ -2,7 +2,7 @@
 #include "Vertex.h"
 #include <stdio.h>
 #include <malloc.h>
-
+#include <d3d11.h>
 
 Model::Model()
 {

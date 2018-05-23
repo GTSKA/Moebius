@@ -35,7 +35,7 @@ float4 PShader(psIn input) : SV_TARGET
 	new_uv[6] = input.uv + float2(0.0,-uStep.y);
 	new_uv[7] = input.uv + float2(uStep.z,-uStep.w);
 	
-	float4 color[9];
+	float3 color[9];
 	color[0] = Texture[0].Sample(samplerDD[0],input.uv);
 	color[1] = Texture[0].Sample(samplerDD[0],new_uv[0]);
 	color[2] = Texture[0].Sample(samplerDD[0],new_uv[1]);
@@ -58,6 +58,7 @@ float4 PShader(psIn input) : SV_TARGET
 	d[8] = CalcMixFactor(new_uv[7]);
 	
 	float total = d[0] + d[1] + d[2] + d[3] + d[4] + d[5] + d[6] + d[7] + d[8];
-	float4 FinalColor = d[0]*color[0] + d[1]*color[1] + d[2]*color[2] + d[3]*color[3] + d[4]*color[4] + d[5]*color[5] + d[6]*color[6] + d[7]*color[7] + d[8]*color[8];
-	return FinalColor/total;
+	float3 FinalColor = d[0]*color[0] + d[1]*color[1] + d[2]*color[2] + d[3]*color[3] + d[4]*color[4] + d[5]*color[5] + d[6]*color[6] + d[7]*color[7] + d[8]*color[8];
+	float3 ColorFinal = FinalColor/total;
+	return float4(ColorFinal,1.0f);
 }

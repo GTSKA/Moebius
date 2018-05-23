@@ -1,5 +1,7 @@
 #pragma once
-#include <d3d11.h>
+class ID3D11Buffer;
+class ID3D11Device;
+class ID3D11DeviceContext;
 static enum MODEL_ERROR
 {
 	MODEL_SUCCESS = 0,
