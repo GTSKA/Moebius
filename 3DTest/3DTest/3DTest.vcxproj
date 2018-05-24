@@ -137,6 +137,7 @@
     <ClCompile Include="Shaders.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TGA.cpp" />
+    <ClCompile Include="WaterWaves.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TGA.h" />
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="WaterWaves.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders.shader" />

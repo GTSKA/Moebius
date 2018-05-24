@@ -11,7 +11,8 @@ class Plane :
 public:
 	Plane();
 	~Plane();
-	void Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext* devcon);
-	void Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext* devcon, int Id);
+	MODEL_ERROR Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext* devcon);
+	MODEL_ERROR Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext* devcon, int Id);
+	void disconnect();
 };
 
