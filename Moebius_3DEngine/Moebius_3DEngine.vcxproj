@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EFA27E22-FDD0-4F85-BE9C-B41414B5FB1B}</ProjectGuid>
+    <RootNamespace>Moebius_3DEngine</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.25431.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\Documents and Settings\Zero\Documentos de simulator project\Visual Studio 2008\Projects\Nemfis\Include Cache\Inlcude (GENE);C:\Archivos de programa\Microsoft SDKs\Windows\v6.0A\Include;C:\Archivos de programa\Microsoft DirectX SDK (February 2006)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>C:\Documents and Settings\Zero\Documentos de simulator project\Visual Studio 2008\Projects\Nemfis\Include Cache\Inlcude (GENE);C:\Archivos de programa\Microsoft SDKs\Windows\v6.0A\Include;C:\Archivos de programa\Microsoft DirectX SDK (February 2006)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CameraBase.cpp" />
+    <ClCompile Include="EffectList_.cpp" />
+    <ClCompile Include="Effect_.cpp" />
+    <ClCompile Include="FractalShaders_.cpp" />
+    <ClCompile Include="FrameMoveCtrl.cpp" />
+    <ClCompile Include="Frustum.cpp" />
+    <ClCompile Include="GeometryList_.cpp" />
+    <ClCompile Include="Geometry_.cpp" />
+    <ClCompile Include="Geometry_Normal_.cpp" />
+    <ClCompile Include="Moebius3D.cpp" />
+    <ClCompile Include="OffScreenRenderManager_.cpp" />
+    <ClCompile Include="PreprocessRender_.cpp" />
+    <ClCompile Include="ResourceCtrl.cpp" />
+    <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TextureList_.cpp" />
+    <ClCompile Include="TextureManager_.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CameraBase.h" />
+    <ClInclude Include="EffectList_.h" />
+    <ClInclude Include="Effect_.h" />
+    <ClInclude Include="FractalShaders_.h" />
+    <ClInclude Include="Fractal_Shaders.h" />
+    <ClInclude Include="FrameMoveCtrl.h" />
+    <ClInclude Include="Frustum.h" />
+    <ClInclude Include="GeometryList_.h" />
+    <ClInclude Include="Geometry_.h" />
+    <ClInclude Include="Geometry_Normal_.h" />
+    <ClInclude Include="M3D_CommondInclude.h" />
+    <ClInclude Include="Moebius3D.h" />
+    <ClInclude Include="OffScreenRenderManager_.h" />
+    <ClInclude Include="PreprocessRender_.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceCtrl.h" />
+    <ClInclude Include="ShaderTextureCodes.h" />
+    <ClInclude Include="SpriteManager.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="TextureList_.h" />
+    <ClInclude Include="TextureManager_.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Moebius_3DEngineRes.rc">
+      <DeploymentContent>true</DeploymentContent>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Moebiues3D Class Diagram.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

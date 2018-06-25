@@ -1,4 +1,4 @@
-#Models: 8
+#Models: 7
 ID 0
 FILE "../Resources/Models/Woman2.nfg"
 ID 1
@@ -13,8 +13,6 @@ ID 5
 FILE "..\Resources\Models\fire.nfg"
 ID 6
 FILE "..\Resources\Models\water.nfg"
-ID 7
-PLANE 20 20
 
 #2D_Textures: 11
 ID 0
