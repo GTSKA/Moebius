@@ -152,6 +152,7 @@ bool ResourceManager::Init(char* fileName, ID3D11Device* dev, ID3D11DeviceContex
 					fscanf_s(RMFile, " %d %d", &w, &h);
 					plane.Init(w, h, dev, devcon, id);
 					m_Models[i] = plane;
+					plane.disconnect();
 				}
 				else if(strcmp(modeltype, "FILE") == 0)
 				{

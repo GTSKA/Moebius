@@ -10,12 +10,12 @@ Plane::Plane()
 Plane::~Plane()
 {
 }
-void Plane::Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext* devcon, int Id)
+MODEL_ERROR Plane::Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext* devcon, int Id)
 {
 	m_id = Id;
-	Init(width, height, dev, devcon);
+	return Init(width, height, dev, devcon);
 }
-void Plane::Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext* devcon)
+MODEL_ERROR Plane::Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext* devcon)
 {
 	VERTEX* modelVertex;
 	UINT* modelIndices;
@@ -54,9 +54,10 @@ void Plane::Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext
 	bd.ByteWidth = sizeof(VERTEX) * m_numVertex;             // size is the VERTEX struct * 3
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       // use as a vertex buffer
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;    // allow CPU to write in buffer
-
-	dev->CreateBuffer(&bd, NULL, &m_vertexBuffer);       // create the buffer
-
+	HRESULT hr;
+	hr = dev->CreateBuffer(&bd, NULL, &m_vertexBuffer);       // create the buffer
+	if(FAILED(hr))
+		return MODEL_VERTEX_ERROR;
 
 														 // copy the vertices into the buffer
 	D3D11_MAPPED_SUBRESOURCE ms;
@@ -71,7 +72,9 @@ void Plane::Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext
 	bd2.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	bd2.MiscFlags = 0;
 
-	dev->CreateBuffer(&bd2, NULL, &m_indexBuffer);
+	hr = dev->CreateBuffer(&bd2, NULL, &m_indexBuffer);
+	if(FAILED(hr))
+		return MODEL_INDEX_ERROR;
 
 	D3D11_MAPPED_SUBRESOURCE ms2;
 	devcon->Map(m_indexBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms2);
@@ -80,4 +83,11 @@ void Plane::Init(UINT width, UINT height, ID3D11Device* dev, ID3D11DeviceContext
 
 	delete[] modelIndices;
 	delete[] modelVertex;
+	return MODEL_SUCCESS;
+}
+
+void Plane::disconnect()
+{
+	m_vertexBuffer = NULL;
+	m_indexBuffer = NULL;
 }

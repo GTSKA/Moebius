@@ -6,7 +6,7 @@ cbuffer ConstantBuffer
 struct VOut
 {
 	float4 color : COLOR;
-	float2 texcoord : TEXCOORD;
+	//float2 texcoord : TEXCOORD;
 	float4 position : SV_POSITION;
 };
 
@@ -15,7 +15,7 @@ VOut VShader(float3 position:POSITION, float2 texcoord : TEXCOORD)
 	VOut output;
 	output.position = mul(WVPMatrix, float4(position,1.0f));
 	output.color = float4(1,1,1,1);
-	output.texcoord = texcoord;
+	//output.texcoord = texcoord;
 	return output;
 }
 /*struct VOut

@@ -12,8 +12,10 @@ Model::Model()
 
 Model::~Model()
 {
-	m_vertexBuffer->Release();
-	m_indexBuffer->Release();
+	if(m_vertexBuffer)
+		m_vertexBuffer->Release();
+	if(m_indexBuffer)
+		m_indexBuffer->Release();
 }
 
 MODEL_ERROR Model::InitModel(char* filename, unsigned int Id, ID3D11Device* dev, ID3D11DeviceContext* devcon)
