@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Globals.h"
 #include "Object.h"
+#include "WaterWaves.h"
 #include "Light.h"
 #include <d3d11.h>
 #include <stdio.h>
@@ -26,6 +27,7 @@ SceneManager::SceneManager(const SceneManager &)
 
 SceneManager::~SceneManager()
 {
+	Clean();
 }
 
 SceneManager* SceneManager::m_pInstance = NULL;
@@ -141,11 +143,22 @@ bool SceneManager::Init(char* FileName)
 		if (strcmp(remark, "#Objects:") == 0)
 		{
 			fscanf_s(SMFile, "%d", &m_ObjectCount);
-			m_Objects = new Object[m_ObjectCount];
+			m_Objects = new Object*[m_ObjectCount];
 			for (int i = 0; i < m_ObjectCount; ++i)
 			{
 				unsigned int id;
 				fscanf_s(SMFile, "%*s %u", &id);
+				char objectclass[50];
+				fscanf_s(SMFile, "%s", objectclass, _countof(objectclass));
+				if (strcmp(objectclass, "OBJECT") == 0)
+				{
+					m_Objects[i] = new Object;
+				}
+				else if (strcmp(objectclass, "WATERWAVES") == 0)
+				{
+					m_Objects[i] = new WaterWaves;
+				}
+					
 				unsigned int modelId;
 				fscanf_s(SMFile, "%*s %u", &modelId);
 				TextureInit Textures2D;
@@ -206,7 +219,7 @@ bool SceneManager::Init(char* FileName)
 							fscanf_s(SMFile, "%u", &TextureId);
 						}
 					}
-					m_Objects[i].InitLights(LightCount, Lights, specPow);
+					m_Objects[i]->InitLights(LightCount, Lights, specPow);
 					delete[] Lights;
 				}
 				Vector3 position, rotation, scale;
@@ -214,7 +227,7 @@ bool SceneManager::Init(char* FileName)
 				fscanf_s(SMFile, "%*s %f, %f, %f", &rotation.x, &rotation.y, &rotation.z);
 				fscanf_s(SMFile, "%*s %f, %f, %f", &scale.x, &scale.y, &scale.z);
 
-				if (!m_Objects[i].Init(id, modelId, &Textures2D, &cubicTextures, shaderId, &position, &rotation, &scale))///Init Object
+				if (!m_Objects[i]->Init(id, modelId, &Textures2D, &cubicTextures, shaderId, &position, &rotation, &scale))///Init Object
 				{
 					fclose(SMFile);
 					return false;
@@ -234,7 +247,7 @@ bool SceneManager::Init(char* FileName)
 				}
 				float tilingFactor;
 				fscanf_s(SMFile, "%*s %f", &tilingFactor);
-				m_Objects[i].InitTilingFactor(tilingFactor);
+				m_Objects[i]->InitTilingFactor(tilingFactor);
 				//fscanf(SMFile, "%*s");//ignore next line(empty line between objects)
 			}
 		}
@@ -253,7 +266,7 @@ void SceneManager::Update(float deltaTime, int pressedKey)
 	}
 	for (int i = 0; i < m_ObjectCount; ++i)
 	{
-		m_Objects[i].Update(deltaTime, pressedKey);
+		m_Objects[i]->Update(deltaTime, pressedKey);
 	}
 	if (pressedKey&(Globals::_KEY_A))
 	{
@@ -293,7 +306,7 @@ void SceneManager::Draw(ID3D11DeviceContext* devcon)
 {
 	for (int i = 0; i < m_ObjectCount; ++i)
 	{
-		m_Objects[i].Draw(m_camera, devcon);
+		m_Objects[i]->Draw(m_camera, devcon);
 	}
 }
 
@@ -304,6 +317,14 @@ void SceneManager::Clean()
 		delete m_camera;
 		m_camera = NULL;
 	}
+	if (m_Objects)
+	{
+		for (int i = 0; i < m_ObjectCount; ++i)
+			delete m_Objects[i];
+		delete[] m_Objects;
+	}
+	if()
+
 }
 float SceneManager::GetTime()
 {

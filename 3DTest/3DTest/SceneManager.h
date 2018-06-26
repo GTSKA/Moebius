@@ -27,7 +27,7 @@ protected:
 	int m_LightCount;
 	Light* m_Lights;
 	int m_ObjectCount;
-	Object* m_Objects;
+	Object** m_Objects;
 	Camera* m_camera;
 	float m_time;
 	Vector3 m_ambientColor;

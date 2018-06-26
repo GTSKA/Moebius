@@ -16,9 +16,9 @@ class Object
 public:
 	Object();
 	~Object();
-	void Update(float deltaTime, int pressedKey);
+	virtual void Update(float deltaTime, int pressedKey);
 	void Draw(Camera* cam, ID3D11DeviceContext* devcon);
-	bool Init(unsigned int ID, unsigned modelID, TextureInit* textures2D, TextureInit* cubicTextures, unsigned int shaderID,
+	virtual bool Init(unsigned int ID, unsigned modelID, TextureInit* textures2D, TextureInit* cubicTextures, unsigned int shaderID,
 		Vector3* position, Vector3* rotation, Vector3* scale);
 	void Clean();
 	void InitLights(int LightCount, unsigned int* Lights, float specularPower = 1.0f);
