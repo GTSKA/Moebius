@@ -59,19 +59,19 @@ namespace MoebiusEngine
 	{
 	}
 
-	Matrix Camera::getWorldMatrix()
+	CMATRIX_FLOAT4 Camera::getWorldMatrix()
 	{
 	}
 
-	Matrix Camera::getViewMatrix()
+	CMATRIX_FLOAT4 Camera::getViewMatrix()
 	{
 	}
 
-	Matrix Camera::getProjectionMatrix()
+	CMATRIX_FLOAT4 Camera::getProjectionMatrix()
 	{
 	}
 
-	Vector3 Camera::getPosition()
+	CVECTOR_FLOAT3 Camera::getPosition()
 	{
 	}
 
@@ -85,11 +85,11 @@ namespace MoebiusEngine
 		return m_fogRange;
 	}
 
-	Vector3 Camera::getFogColor()
+	CVECTOR_FLOAT3 Camera::getFogColor()
 	{
 	}
 
-	void Camera::initFog(Vector3 fogColor, float fogStart, float fogRange)
+	void Camera::initFog(CVECTOR_FLOAT3 fogColor, float fogStart, float fogRange)
 	{
 
 	}

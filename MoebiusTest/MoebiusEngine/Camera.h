@@ -1,4 +1,6 @@
 #pragma once
+#include "CVector_.h"
+#include "CMatrix_.h"
 namespace MoebiusEngine
 {
 	class Camera
@@ -16,24 +18,24 @@ namespace MoebiusEngine
 		void rotateDown(float deltaTime);
 		void rotateLeft(float deltaTime);
 		void rotateRight(float deltaTime);
-		Matrix getWorldMatrix();
-		Matrix getViewMatrix();
-		Matrix getProjectionMatrix();
-		Vector3 getPosition();
-		Vector3 getFogColor();
+		CMATRIX_FLOAT4 getWorldMatrix();
+		CMATRIX_FLOAT4 getViewMatrix();
+		CMATRIX_FLOAT4 getProjectionMatrix();
+		CVECTOR_FLOAT3 getPosition();
+		CVECTOR_FLOAT3 getFogColor();
 		float getFogStart();
 		float getFogRange();
-		void initFog(Vector3 fogColor, float fogStart, float fogRange);
+		void initFog(CVECTOR_FLOAT3 fogColor, float fogStart, float fogRange);
 		void calcWorldMatrix();
 		void calcViewMatrix();
 	protected:
-		Vector3 m_positionInfo;
-		Vector3 m_rotateInfo;
-		Matrix m_worldMatrix;
-		Matrix m_viewMatrix;
-		Matrix m_projectionMatrix;
+		CVECTOR_FLOAT3 m_positionInfo;
+		CVECTOR_FLOAT3 m_rotateInfo;
+		CMATRIX_FLOAT4 m_worldMatrix;
+		CMATRIX_FLOAT4 m_viewMatrix;
+		CMATRIX_FLOAT4 m_projectionMatrix;
 		float m_Speed;
-		Vector3 m_fogColor;
+		CVECTOR_FLOAT3 m_fogColor;
 		float m_fogStart;
 		float m_fogRange;
 	};
