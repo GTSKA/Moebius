@@ -1,0 +1,153 @@
+#Shaders: 6
+ID 0
+VS "../Resources/Shaders/VSEffect.glsl"
+FS "../Resources/Shaders/FSBW.glsl"
+ID 1
+VS "../Resources/Shaders/VSEffect.glsl"
+FS "../Resources/Shaders/FSBlur.glsl"
+ID 2
+VS "../Resources/Shaders/VSEffect.glsl"
+FS "../Resources/Shaders/FSPreBloom.glsl"
+ID 3
+VS "../Resources/Shaders/VSEffect.glsl"
+FS "../Resources/Shaders/FSPostBloom.glsl"
+ID 4
+VS "../Resources/Shaders/VSEffect.glsl"
+FS "../Resources/Shaders/FSDOF_Blur.glsl"
+ID 5
+VS "../Resources/Shaders/VSEffect.glsl"
+FS "../Resources/Shaders/FSDOF_Step.glsl"
+
+#FBO
+NoFBO 3
+#Effects: 4
+ID 0
+Name BW
+NoPasses: 1
+PassID 0
+PassName BW
+ ShaderID 0
+ Textures: 1c, 0, 0
+ Target: 0 
+ OtherData: 0.0
+ID 1
+Name BLUR
+NoPasses: 5
+PassID 0
+PassName BLUR
+ ShaderID 1
+ Textures: 1c, 0, 0
+ Target: 2
+ OtherData: 5.0
+PassID 1
+PassName BLUR
+ ShaderID 1
+ Textures: 2c, 0, 0
+ Target: 3
+ OtherData: 17.0
+PassID 2
+PassName BLUR
+ ShaderID 1
+ Textures: 3c, 0, 0
+ Target: 2
+ OtherData: 31.0
+PassID 3
+PassName BLUR
+ ShaderID 1
+ Textures: 2c, 0, 0
+ Target: 3
+ OtherData: 43.0  
+PassID 4
+PassName BLUR
+ ShaderID 1
+ Textures: 3c, 0, 0
+ Target: 0
+ OtherData: 63.0
+ID 2
+Name Bloom
+NoPasses: 7
+PassID 0
+PassName Prebloom
+ ShaderID 2
+ Textures: 1c, 0, 0
+ Target: 2
+ OtherData: 0.5
+PassID 1
+ PassName Blur
+ ShaderID 1
+ Textures: 2c, 0, 0
+ Target: 3
+ OtherData: 5.0
+PassID 2
+PassName Blur
+ ShaderID 1
+ Textures: 3c, 0, 0
+ Target: 2
+ OtherData: 9.0 
+PassID 3
+PassName Blur
+ ShaderID 1
+ Textures: 2c, 0, 0
+ Target: 3
+ OtherData: 17.0
+PassID 4
+PassName Blur
+ ShaderID 1
+ Textures: 3c, 00, 00
+ Target: 2
+ OtherData: 31 
+PassID 5
+PassName Blur
+ ShaderID 1
+ Textures: 2c, 00, 00
+ Target: 3
+ OtherData: 43
+PassID 6
+PassName PostBloom
+ ShaderID 3
+ Textures: 1c, 3c, 0
+ Target: 0
+ OtherData: 1.5
+ID 3
+Name FBO
+NoPasses: 4
+PassID 0
+PassName DOF_BLUR
+ ShaderID 4
+ Textures: 1c, 1d, 0
+ Target: 2
+ OtherData: 3.0
+ OtherData: 0.1
+ OtherData: 500.0
+ OtherData: 20.0
+ OtherData: 0.9
+PassID 1
+PassName DOF_BLUR
+ ShaderID 4
+ Textures: 2c, 1d, 0
+ Target: 3
+ OtherData: 5.0
+ OtherData: 0.1
+ OtherData: 500.0
+ OtherData: 20.0
+ OtherData: 0.9
+PassID 2
+PassName DOF_BLUR
+ ShaderID 4
+ Textures: 3c, 1d, 0
+ Target: 2
+ OtherData: 9.0
+ OtherData: 0.1
+ OtherData: 500.0
+ OtherData: 20.0
+ OtherData: 0.9
+PassID 3
+PassName DOF_STEP
+ ShaderID 5
+ Textures: 1c, 2c, 1d
+ Target: 0
+ OtherData: 16.0
+ OtherData: 0.1
+ OtherData: 500.0
+ OtherData: 20.0
+ OtherData: 0.9

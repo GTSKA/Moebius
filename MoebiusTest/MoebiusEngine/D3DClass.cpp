@@ -1,10 +1,7 @@
 #include "D3DClass.h"
 #include <tchar.h>
 
-//include Direct3D Library file
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "d3dcompiler.lib")
+
 
 namespace MoebiusEngine
 {
@@ -297,6 +294,18 @@ namespace MoebiusEngine
 
 		// Bind the render target view and depth stencil buffer to the output render pipeline.
 		m_devcon->OMSetRenderTargets(1, &m_backbuffer, m_depthStencilView);
+
+		//////////////////set the viewport
+		ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
+
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = screenWidth;
+		viewport.Height = screenHeight;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 0.99f;
+
+		m_devcon->RSSetViewports(1, &viewport);
 
 		// Setup the raster description which will determine how and what polygons will be drawn.
 		rasterDesc.AntialiasedLineEnable = false;

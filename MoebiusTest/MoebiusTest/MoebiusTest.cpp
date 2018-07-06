@@ -3,8 +3,10 @@
 
 #include "stdafx.h"
 #include "MoebiusTest.h"
-#include "Moebius.h"
-#include "InputManager.h"
+#include "GUI.h"
+#include "SystemGUI.h"
+
+
 
 #define MAX_LOADSTRING 100
 
@@ -13,10 +15,7 @@ HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
-LARGE_INTEGER g_L1;
-LARGE_INTEGER g_L0;
-LARGE_INTEGER Fq;
-float g_DeltaTime;
+
 
 int keyPressed;
 
@@ -25,15 +24,27 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-bool				Frame();
-void UpdateTime();
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
+	GUI* UserInterface;
+	UserInterface = new GUI;
+	if (!UserInterface)
+		return 0;
+	if (UserInterface->Init())
+		UserInterface->Run();
+	UserInterface->shutdown();
+	delete UserInterface;
+	UserInterface = 0;
+
+	return 0;
+
+	
+   /* UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
@@ -56,20 +67,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	QueryPerformanceFrequency(&Fq);
 	QueryPerformanceCounter(&g_L0);
     // Main message loop:
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-		UpdateTime();
-		result = Frame();
-		if (!result)
-			break;
-    }
+	bool done = false;
+	while (!done)
+	{
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		if (msg.message == WM_QUIT)
+		{
+			done = true;
+		}
+		else 
+		{
+			UpdateTime();
+			Update();
+			result = Frame();
+		}
+	}
+    
 
-    return (int) msg.wParam;
+    return (int) msg.wParam;*/
 }
 
 
@@ -125,10 +144,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    // Determine the resolution of the clients desktop screen.
    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-   //Connect to Moebius Engine
-   MoebiusEngine::Moebius::getInstance()->init(screenWidth, screenHeight, hWnd);
-   //init InputManager
-   MoebiusEngine::InputManager::getInstance()->init();
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
@@ -176,12 +191,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 	case WM_KEYDOWN:
 	{
-		MoebiusEngine::InputManager::getInstance()->keyDown((unsigned int)wParam);
 	}
 	break;
 	case WM_KEYUP: 
 	{
-		MoebiusEngine::InputManager::getInstance()->keyUp((unsigned int)wParam);
 	}
 	break;
     case WM_DESTROY:
@@ -213,27 +226,4 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-bool Frame()
-{
-	bool result;
 
-	result = MoebiusEngine::Moebius::getInstance()->Frame();
-	if (!result)
-		return false;
-	return true;
-}
-
-void UpdateTime()
-{
-	//Take the frec read
-	QueryPerformanceCounter(&g_L1);
-
-	//Obtain delta frec
-	long long Diff = g_L1.QuadPart - g_L0.QuadPart;
-
-	//obtaint delta time in sec
-	g_DeltaTime = (float)Diff / Fq.QuadPart;
-
-	//Update current read
-	g_L0 = g_L1;
-}

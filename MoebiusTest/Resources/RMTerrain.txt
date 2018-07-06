@@ -1,0 +1,26 @@
+#Models: 1
+ID 0
+FILE "../Resources/Models/Terrain.nfg"
+
+#2D_Textures: 4
+ID 0
+FILE "../Resources/Textures/Grass.tga"
+MODE GL_REPEAT
+ID 1
+FILE "../Resources/Textures/Dirt.tga"
+MODE GL_REPEAT
+ID 2
+FILE "../Resources/Textures/Rock.tga"
+MODE GL_REPEAT
+ID 3
+FILE "../Resources/Textures/Terrain_blend_map.tga"
+MODE GL_REPEAT
+
+#Shaders: 1
+ID 0
+VS "../Resources/Shaders/TerrainShaderVS.vs"
+FS "../Resources/Shaders/TerrainShaderFS.fs"
+
+STATES 2
+GL_CULL_FACE
+GL_DEPTH_TEST

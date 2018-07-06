@@ -1,0 +1,98 @@
+#Models: 7
+ID 0
+FILE "..\Resources\Models\SkyBox.nfg"
+ID 1
+FILE "..\Resources\Models\Bila.nfg"
+ID 2
+FILE "..\Resources\Models\Terrain.nfg"
+ID 3
+FILE "..\Resources\Models\fire.nfg"
+ID 4
+FILE "..\Resources\Models\Woman2.nfg"
+ID 5
+FILE "..\Resources\Models\Woman1.nfg"
+ID 6
+FILE "..\Resources\Models\water.nfg"
+
+#2D_Textures: 11
+ID 0
+FILE "../Resources/Textures/Grass.tga"
+MODE GL_REPEAT
+ID 1
+FILE "../Resources/Textures/Dirt.tga"
+MODE GL_REPEAT
+ID 2
+FILE "../Resources/Textures/Rock.tga"
+MODE GL_REPEAT
+ID 3
+FILE "../Resources/Textures/Terrain_blend_map.tga"
+MODE GL_REPEAT
+ID 4
+FILE "../Resources/Textures/fire3.tga"
+MODE GL_CLAMP_TO_EDGE
+ID 5
+FILE "../Resources/Textures/fire_mask.tga"
+MODE GL_CLAMP_TO_EDGE
+ID 6
+FILE "../Resources/Textures/DisplacementMap.tga"
+MODE GL_REPEAT
+ID 7
+FILE "../Resources/Textures/Woman2.tga"
+MODE GL_CLAMP_TO_EDGE 
+ID 8
+FILE "../Resources/Textures/Woman1.tga"
+MODE GL_CLAMP_TO_EDGE
+ID 9
+FILE "../Resources/Textures/NormalMap.tga"
+MODE GL_CLAMP_TO_EDGE
+ID 10
+FILE "../Resources/Textures/WaterNormal.tga"
+MODE GL_REPEAT
+
+#Cube_Textures: 1
+ID 0
+FILE "..\Resources\Textures\envMap.tga"
+
+#Shaders: 7
+ID 0
+VS "..\Resources\Shaders\CubeMapVS.vs"
+FS "..\Resources\Shaders\CubeMapFS.fs"
+STATES 1
+GL_DEPTH_TEST
+ID 1
+VS "..\Resources\Shaders\EnvReflectVS.vs"
+FS "..\Resources\Shaders\EnvReflectFS.fs"
+STATES 2
+GL_CULL_FACE
+GL_DEPTH_TEST
+ID 2
+VS "../Resources/Shaders/TerrainShaderVS.vs"
+FS "../Resources/Shaders/TerrainShaderFS.fs"
+STATES 2
+GL_CULL_FACE
+GL_DEPTH_TEST
+ID 3
+VS "../Resources/Shaders/FireVS.vs"
+FS "../Resources/Shaders/FireFS.fs"
+STATES 3
+GL_CULL_FACE
+GL_DEPTH_TEST
+GL_BLEND
+ID 4
+VS "../Resources/Shaders/IlluminationVS.vs"
+FS "../Resources/Shaders/IlluminationFS.fs"
+STATES 2
+GL_CULL_FACE
+GL_DEPTH_TEST
+ID 5
+VS "../Resources/Shaders/Illumination2VS.vs"
+FS "../Resources/Shaders/Illumination2FS.fs"
+STATES 2
+GL_CULL_FACE
+GL_DEPTH_TEST
+ID 6
+VS "../Resources/Shaders/WaterVS.vs"
+FS "../Resources/Shaders/WaterFS.fs"
+STATES 2
+GL_CULL_FACE
+GL_DEPTH_TEST

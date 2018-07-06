@@ -76,8 +76,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\Nemfis\Include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENGL_PROJECT;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\Nemfis\Include;..\glew-2.1.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -90,7 +90,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\Nemfis\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Nemfis\Include;..\glew-2.1.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -105,7 +105,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\Nemfis\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Nemfis\Include;..\glew-2.1.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -122,7 +122,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\Nemfis\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Nemfis\Include;..\glew-2.1.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -137,22 +137,45 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColorShader.h" />
     <ClInclude Include="D3DClass.h" />
+    <ClInclude Include="Frustum.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="GUI.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Moebius.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="OpenGLClass.h" />
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TGA.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ColorShader.cpp" />
     <ClCompile Include="D3DClass.cpp" />
+    <ClCompile Include="Frustum.cpp" />
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="GUI.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Moebius.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Nemfis\Project\NemfisUtils.vcxproj">
-      <Project>{79ddabb2-0690-4fee-b40c-4bc2b273762f}</Project>
-    </ProjectReference>
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="OpenGLClass.cpp" />
+    <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TGA.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
