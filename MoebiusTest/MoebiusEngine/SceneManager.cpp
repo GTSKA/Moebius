@@ -309,11 +309,11 @@ namespace MoebiusEngine
 #endif
 	{
 		bool renderObject;
-		//m_frustum->constructFrustum(Globals::SCREEN_DEPTH, m_camera->getProjectionMatrix(), m_camera->getViewMatrix());
+		m_frustum->constructFrustum(Globals::SCREEN_DEPTH, m_camera->getProjectionMatrix(), m_camera->getViewMatrix());
 		float radius;
 		for (int i = 0; i < m_ObjectCount; ++i)
 		{
-			/*if (m_Objects[i]->shouldCalcFrustum())
+			if (m_Objects[i]->shouldCalcFrustum())
 			{
 				radius = max3(m_Objects[i]->getSize().x, m_Objects[i]->getSize().y, m_Objects[i]->getSize().z);
 				if (m_frustum->checkSphere(m_Objects[i]->getCenter(), radius))
@@ -325,7 +325,7 @@ namespace MoebiusEngine
 #endif
 				}
 			}
-			else*/
+			else
 #ifdef OPENGL_PROJECT
 				m_Objects[i]->Draw(m_camera, openGL);
 #else

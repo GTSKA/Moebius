@@ -144,7 +144,7 @@ namespace MoebiusEngine
 	{
 		for (register int i = 0; i < 6; ++i)
 		{
-			if (Plane::DotCoord(m_planes[i], Vector3(xCenter, yCenter, zCenter)) < radius)
+			if (Plane::DotCoord(m_planes[i], Vector3(xCenter, yCenter, zCenter)) < -radius)
 				return false;
 		}
 		return true;
@@ -153,7 +153,7 @@ namespace MoebiusEngine
 	{
 		for (register int i = 0; i < 6; ++i)
 		{
-			if (Plane::DotCoord(m_planes[i],center) < radius)
+			if (Plane::DotCoord(m_planes[i],center) < -radius)
 				return false;
 		}
 		return true;
