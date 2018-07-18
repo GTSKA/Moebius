@@ -5,10 +5,13 @@
 #include <functional>
 #include <cstdlib>
 #include <vector>
+#include <array>
 #include <map>
 #include <set>
 #include <algorithm>
 #include <fstream>
+#include "MathUtils.h"
+
 
 /*
 GRAPHIC PIPELINE
@@ -60,6 +63,44 @@ struct SwapChainSupportDetails
 	std::vector<VkSurfaceFormatKHR> formats;
 	std::vector<VkPresentModeKHR> presentModes;
 };
+struct Vertex
+{
+	Vector2 pos;
+	Vector3 color;
+	static VkVertexInputBindingDescription getBindingDescription()
+	{
+		VkVertexInputBindingDescription bindingDescription = {};
+		bindingDescription.binding = 0;
+		bindingDescription.stride = sizeof(Vertex);
+		bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+		return bindingDescription;
+	}
+	static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions()
+	{
+		std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = {};
+		attributeDescriptions[0].binding = 0;
+		attributeDescriptions[0].location = 0;
+		attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+		attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+		attributeDescriptions[1].binding = 0;
+		attributeDescriptions[1].location = 1;
+		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+		return attributeDescriptions;
+	}
+	Vertex(const Vertex& a)
+	{
+		pos = a.pos;
+		color = a.color;
+	}
+	Vertex(Vector2 _pos, Vector3 _color)
+	{
+		pos = _pos;
+		color = _color;
+	}
+};
 class HelloTriangle 
 {
 public:
@@ -93,6 +134,7 @@ private:
 		createGraphicsPipeline(); // Graphics Pipeline tutorial
 		createFramebuffers();//Drawing tutorial
 		createCommandPool();//Drawing tutorial
+		createVertexBuffer();
 		createCommandBuffers();//Drawing tutorial
 		createSyncObjects();
 	}
@@ -266,12 +308,18 @@ private:
 		//It describes this in roughly two ways:
 		//Bindings: spacing between data and whether the data is per-vertex or per-instance
 		//Attribute descriptions: type of the attributes passed to the vertex shader, which binding to load them from and at which offset
+
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexBindingDescriptionCount = 0;
-		vertexInputInfo.pVertexBindingDescriptions = nullptr;
-		vertexInputInfo.vertexAttributeDescriptionCount = 0;
-		vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+
+		auto bindingDescription = Vertex::getBindingDescription();
+		auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+		
+		vertexInputInfo.vertexBindingDescriptionCount = 1;
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 		//VkPipelineInputAssemblyStateCreateInfo describes two things: what kind of geometry will be drawn from the vertices and if primitive restart should be enabled
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
@@ -321,7 +369,7 @@ private:
 		multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 		multisampling.sampleShadingEnable = VK_FALSE;
 		multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-		multisampling.minSampleShading - 1.0f;
+		multisampling.minSampleShading = 1.0f;
 		multisampling.pSampleMask = nullptr;
 		multisampling.alphaToCoverageEnable = VK_FALSE;
 		multisampling.alphaToOneEnable = VK_FALSE;
@@ -379,7 +427,7 @@ private:
 		pipelineInfo.layout = pipelineLayout;
 		pipelineInfo.renderPass = renderPass;
 		pipelineInfo.subpass = 0;
-		pipelineInfo.basePipelineHandle == VK_NULL_HANDLE;
+		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 		pipelineInfo.basePipelineIndex = -1; // Vulkan allows you to create a new graphics pipeline by deriving from an existing pipeline. 
 		//The idea of pipeline derivatives is that it is less expensive to set up pipelines when they have much functionality in common with an existing pipeline 
 		//and switching between pipelines from the same parent can also be done quicker
@@ -509,7 +557,10 @@ private:
 
 			vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-			vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+			VkBuffer vertexBuffers[] = { vertexBuffer };
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+			vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 			//vertexCount, instanceCount, firstVertex, firstInstance
 			vkCmdEndRenderPass(commandBuffers[i]);
 			
@@ -536,6 +587,33 @@ private:
 			vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore[i]) != VK_SUCCESS ||
 			vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
 			throw std::runtime_error("failed to create semaphore!");
+	}
+
+	void createVertexBuffer()
+	{
+		VkBufferCreateInfo bufferInfo = {};
+		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferInfo.size = sizeof(vertices[0])* vertices.size();
+		bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		if (vkCreateBuffer(device, &bufferInfo, nullptr, &vertexBuffer) != VK_SUCCESS)
+			throw std::runtime_error("failed to create vertex buffer!");
+		VkMemoryRequirements memRequirements;
+		vkGetBufferMemoryRequirements(device, vertexBuffer, &memRequirements);
+
+		VkMemoryAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = memRequirements.size;
+		allocInfo.memoryTypeIndex = finMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		if (vkAllocateMemory(device, &allocInfo, nullptr, &vertexBufferMemory) != VK_SUCCESS)
+			throw std::runtime_error("failed to allocate vertex buffer memory!");
+		vkBindBufferMemory(device, vertexBuffer, vertexBufferMemory, 0);
+		void* data;
+		vkMapMemory(device, vertexBufferMemory, 0, bufferInfo.size, 0, &data);
+		memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+		vkUnmapMemory(device, vertexBufferMemory);
+		
 	}
 
 	VkShaderModule createShaderModule(const std::vector<char>& code)
@@ -752,6 +830,8 @@ private:
 	void cleanup()
 	{
 		cleanupSwapChain();
+		vkDestroyBuffer(device, vertexBuffer, nullptr);
+		vkFreeMemory(device, vertexBufferMemory, nullptr);
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
 		{
 			vkDestroySemaphore(device, renderFinishedSemaphore[i], nullptr);
@@ -873,6 +953,16 @@ private:
 		return extensions;
 	}
 
+	uint32_t finMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+	{
+		VkPhysicalDeviceMemoryProperties memProperties;
+		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
+			if (typeFilter&(1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+				return i;
+		throw std::runtime_error("failed to find suitable memory type!");
+	}
+
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
 	{
 		QueueFamilyIndices indices;
@@ -961,6 +1051,11 @@ private:
 	const int MAX_FRAMES_IN_FLIGHT = 2;
 	const std::vector<const char*> validationLayers = { "VK_LAYER_LUNARG_standard_validation" };
 	const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+	const std::vector<Vertex> vertices = {
+		Vertex(Vector2(0.0f, -0.5f), Vector3(1.0f, 1.0f, 0.0f)),
+		Vertex(Vector2(0.5f, 0.5f), Vector3(0.0f, 1.0f, 1.0f)),
+		Vertex(Vector2(-0.5f, 0.5f), Vector3(1.0f, 0.0f, 1.0f))
+	};
 #ifdef NDEBUG
 	const bool enableValidationLayers = false;
 #else
@@ -984,6 +1079,9 @@ private:
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
 	VkCommandPool commandPool;
+	VkBuffer vertexBuffer;
+	VkDeviceMemory vertexBufferMemory;
+	
 	std::vector<VkSemaphore> imageAvailableSemaphore;
 	std::vector<VkSemaphore> renderFinishedSemaphore;
 	std::vector<VkFence> inFlightFences;
