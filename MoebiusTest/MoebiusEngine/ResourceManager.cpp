@@ -161,7 +161,7 @@ namespace MoebiusEngine
 #ifdef OPENGL_PROJECT
 						Rectangle plane(openGL);
 #else
-						Rectangle plane();
+						Rectangle plane;
 #endif
 						fscanf_s(RMFile, " %d %d", &w, &h);
 #ifdef OPENGL_PROJECT

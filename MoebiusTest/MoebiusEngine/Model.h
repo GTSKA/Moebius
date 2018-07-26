@@ -40,7 +40,6 @@ namespace MoebiusEngine
 		MODEL_ERROR InitTriangle(Vector3 v1, Vector3 v2, Vector3 v3, Vector4 color, ID3D11Device* dev);
 		ID3D11Buffer* getIndexBuffer();
 		ID3D11Buffer* getVertexBuffer();
-	protected:
 		ID3D11Buffer* m_vertexBuffer;
 		ID3D11Buffer* m_indexBuffer;
 #endif

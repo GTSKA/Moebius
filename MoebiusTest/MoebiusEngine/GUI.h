@@ -29,6 +29,7 @@
 #ifdef OPENGL_PROJECT
 		bool InitializeWindows(MoebiusEngine::OpenGLClass*, int&, int&);
 #else
+		bool InitializeWindows(int&, int&);
 #endif
 		void shutdownWindows();
 

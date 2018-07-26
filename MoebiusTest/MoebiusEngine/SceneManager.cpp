@@ -57,8 +57,11 @@ namespace MoebiusEngine
 			m_pInstance = NULL;
 		}
 	}
-
+#ifdef OPENGL_PROJECT
 	bool SceneManager::Init(char* FileName, OpenGLClass* openGL)
+#else
+	bool SceneManager::Init(char* FileName)
+#endif
 	{
 		if (FileName == NULL)
 		{
@@ -257,7 +260,9 @@ namespace MoebiusEngine
 					fscanf_s(SMFile, "%*s %f", &tilingFactor);
 					m_Objects[i]->InitTilingFactor(tilingFactor);
 					m_Objects[i]->setFrustum(frustum);
+#ifdef OPENGL_PROJECT
 					m_Objects[i]->InitVAO(openGL);
+#endif
 					//fscanf(SMFile, "%*s");//ignore next line(empty line between objects)
 				}
 			}
@@ -316,7 +321,7 @@ namespace MoebiusEngine
 			if (m_Objects[i]->shouldCalcFrustum())
 			{
 				radius = max3(m_Objects[i]->getSize().x, m_Objects[i]->getSize().y, m_Objects[i]->getSize().z);
-				if (m_frustum->checkSphere(m_Objects[i]->getCenter(), radius))
+				if (true)
 				{
 #ifdef OPENGL_PROJECT
 					m_Objects[i]->Draw(m_camera, openGL);

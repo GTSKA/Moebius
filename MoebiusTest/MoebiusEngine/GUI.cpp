@@ -15,11 +15,15 @@
 
 	GUI::GUI()
 	{
+#ifdef OPENGL_PROJECT
 		m_OpenGL = 0;
+#endif
 	}
 	GUI::GUI(const GUI&)
 	{
+#ifdef OPENGL_PROJECT
 		m_OpenGL = 0;
+#endif
 	}
 
 	GUI::~GUI()
@@ -42,11 +46,16 @@
 		MoebiusEngine::InputManager::getInstance()->init();
 		MoebiusEngine::Moebius::getInstance()->init(screenW, screenH, m_hwnd, m_OpenGL);
 #else
+		if (!InitializeWindows(screenW, screenH))
+		{
+			OutputDebugStringA("Could not initialize the window : Error");
+			return false;
+		}
 		MoebiusEngine::InputManager::getInstance()->init();
 		MoebiusEngine::Moebius::getInstance()->init(screenW, screenH, m_hwnd);
 #endif
 		
-		
+		return true;
 
 	}
 	void GUI::shutdown()
@@ -125,8 +134,11 @@
 			break;
 		}
 	}
-
+#ifdef OPENGL_PROJECT
 	bool GUI::InitializeWindows(MoebiusEngine::OpenGLClass* openGL, int& screenWidth, int& screenHeight)
+#else
+	bool GUI::InitializeWindows(int& screenWidth, int& screenHeight)
+#endif
 	{
 		WNDCLASSEX wc;
 		DEVMODE dmScreenSettings;

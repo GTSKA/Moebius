@@ -154,6 +154,7 @@ public:
 	Matrix & SetTranslation(Vector3 &vec);
 
 	Matrix & SetPerspective(GLfloat fovY, GLfloat aspect, GLfloat nearPlane, GLfloat farPlane);
+	Matrix & LookAt(Vector3 pos, Vector3 target, Vector3 Up);
 
 	Matrix Transpose();
 

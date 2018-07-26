@@ -30,7 +30,7 @@ float fresnelTerm(float3 Normal, float3 toEye)
 }
 float3 diffuseCI(float3 Normal, float3 lightDir, int i)
 {
-	float3 diffColor = max(dot(Normal, lightDir),0.0)*uLightColors[i];
+	float3 diffColor = max(dot(Normal, -lightDir),0.0)*uLightColors[i];
 	return diffColor;
 }
 float3 specular(float3 lightDir, float3 normal, int i, float3 toEye)
@@ -51,7 +51,7 @@ struct PS_In
 float4 PShader(PS_In input) : SV_TARGET
 {
 	float3 Normal = Texture[1].Sample(samplerDD[1],input.texcoord).xyz;
-	float3x3 TBN=float3x3(normalize(input.tanW), normalize(input.bNormW), normalize(input.normalW)); 
+	float3x3 TBN = float3x3(normalize(input.tanW), normalize(input.bNormW), normalize(input.normalW)); 
 	float3 NormW = normalize(mul(TBN,2.0f*Normal - 1.0f));
 	float3 toEye = normalize(ucamPos - input.wPos);
 	
@@ -61,7 +61,7 @@ float4 PShader(PS_In input) : SV_TARGET
 	float dMaxRefraction = input.texcoord.x * uDepthAdjustDisplacement;
 	
 	float2 offsetRefraction = (2.0f * disp - 1.0)*dMaxRefraction;
-	float newtexcoord = input.texcoord + offsetRefraction;
+	float2 newtexcoord = input.texcoord + offsetRefraction;
 	float3 bottomColor = Texture[0].Sample(samplerDD[0],newtexcoord).xyz;
 	
 	float3 refractionColor = lerp(bottomColor, uWaterColor, depthFactor);

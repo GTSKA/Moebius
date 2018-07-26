@@ -64,6 +64,7 @@ namespace MoebiusEngine
 		camRotationYMatrix.SetRotationY(-m_rotateInfo.y);
 		camRotationXMatrix.SetRotationX(-m_rotateInfo.x);
 		m_viewMatrix = camTranslationMatrix * camRotationYMatrix * camRotationXMatrix;
+		//m_viewMatrix.LookAt(m_positionInfo, Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
 	}
 
 	void Camera::moveForward(float deltaTime)

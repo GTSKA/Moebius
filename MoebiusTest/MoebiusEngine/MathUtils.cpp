@@ -529,41 +529,72 @@ Matrix & Matrix::SetTranslation(Vector3 &vec)
 
 Matrix & Matrix::SetPerspective(GLfloat fovY, GLfloat aspect, GLfloat nearPlane, GLfloat farPlane)
 {
-	GLfloat height = 2.0f * nearPlane * tanf(fovY * 0.5f);
-	GLfloat width = height * aspect;
-	GLfloat n2 = 2.0f * nearPlane;
-	GLfloat rcpnmf = 1.f / (nearPlane - farPlane);
+#ifndef OPENGL_PROJECT
+	GLfloat height = 1.0f / tanf(fovY / 2.0f);
+	GLfloat width = height/ aspect;
+#else
+	GLfloat height = aspect / tanf(fovY / 2.0f);
+	GLfloat width = 1.0f / tanf(fovY / 2.0f);
+#endif
 
-	m[0][0] = n2 / width;
+	m[0][0] = width;
 	m[1][0] = 0;
 	m[2][0] = 0;
 	m[3][0] = 0;
 
 	m[0][1] = 0;
-	m[1][1] = n2 / height;
+	m[1][1] = height;
 	m[2][1] = 0;
 	m[3][1] = 0;
 
 	m[0][2] = 0;
 	m[1][2] = 0;
+#ifndef OPENGL_PROJECT
+	m[2][2] = farPlane / (farPlane - nearPlane);
+	m[3][2] = -nearPlane * farPlane / (farPlane - nearPlane);
+#else
+	m[2][2] = farPlane / (nearPlane - farPlane);
+	m[3][2] = -nearPlane * farPlane / (farPlane - nearPlane);
+#endif
 
 	m[0][3] = 0;
 	m[1][3] = 0;
-	m[3][3] = 0;
-
 #ifndef OPENGL_PROJECT
-
-	m[2][2] = -1.0f*farPlane * rcpnmf;
-	m[3][2] = farPlane * nearPlane * rcpnmf;
-
 	m[2][3] = 1.f;
-
 #else
-	m[2][2] = (farPlane + nearPlane) * rcpnmf;
-	m[3][2] = farPlane * rcpnmf * n2;
-
 	m[2][3] = -1.f;
 #endif
+	m[3][3] = 0;
+
+	return *this;
+}
+
+Matrix & Matrix::LookAt(Vector3 pos, Vector3 target, Vector3 Up)
+{
+	Vector3 zaxis, xaxis, yaxis;
+	zaxis = (pos - target).Normalize();
+	xaxis = Vector3::Cross(Up, zaxis);
+	yaxis = Vector3::Cross(zaxis, xaxis);
+
+	m[0][0] = xaxis.x;
+	m[1][0] = xaxis.y;
+	m[2][0] = xaxis.z;
+	m[3][0] = -(Vector3::Dot(xaxis, pos));
+
+	m[0][1] = yaxis.x;
+	m[1][1] = yaxis.y;
+	m[2][1] = yaxis.z;
+	m[3][1] = -(Vector3::Dot(yaxis, pos));
+
+	m[0][2] = zaxis.x;
+	m[1][2] = zaxis.y;
+	m[2][2] = zaxis.z;
+	m[3][2] = -(Vector3::Dot(zaxis, pos));
+
+	m[0][3] = 0.0f;
+	m[1][3] = 0.0f;
+	m[2][3] = 0.0f;
+	m[3][3] = 0.0f;
 
 	return *this;
 }

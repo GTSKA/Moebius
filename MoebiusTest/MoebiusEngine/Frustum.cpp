@@ -151,9 +151,11 @@ namespace MoebiusEngine
 	}
 	bool Frustum::checkSphere(Vector3& center, float radius)
 	{
+		float val;
 		for (register int i = 0; i < 6; ++i)
 		{
-			if (Plane::DotCoord(m_planes[i],center) < -radius)
+			val = Plane::DotCoord(m_planes[i], center);
+			if (val < -radius)
 				return false;
 		}
 		return true;
